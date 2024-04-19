@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Rubik', sans-serif;
+  transition: all ease-in 0.6s;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+$primary: #2d915a;
+
+$theme-colors: map-merge($theme-colors, (
+  "primary": $primary
+));
+
+@import "bootstrap/scss/bootstrap";
+.btn-primary {
+  @include button-variant(
+    $primary,
+    $primary,
+    $gray-100,
+    darken($primary, 10%),
+    darken($primary, 10%),
+    $gray-100
+  );
+}
+
+.nav-pills .nav-link {
+  transition: .1s all ease-in;
+  border-radius: 22px;
+
+  & {
+    color: $primary;
+    border-radius: 12px;
+  }
+  &.active, &:hover {
+    background-color: $primary;
+    color: $gray-100; 
+    border-radius: 24px;
+  }
+}

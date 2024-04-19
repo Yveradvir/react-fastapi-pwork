@@ -18,8 +18,11 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@modules/*": ["./src/modules/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "src/modules/validations", "src/modules/reducers", "src/modules/components", "src/modules/api"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
