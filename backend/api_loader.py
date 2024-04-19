@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import _g
 
 from src.jwt import JwtSecure, JwtConfig
+from src.db import db
 
 jwtsecure = JwtSecure(JwtConfig(
     secret_key=_g("secret_key")
