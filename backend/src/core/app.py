@@ -1,6 +1,8 @@
 from config import _g
 from api_loader import *
 
+from .set_routers import set_routers
+
 def makeapp() -> FastAPI:
     """
     The function to launch FastApi application
@@ -18,6 +20,8 @@ def makeapp() -> FastAPI:
         allow_methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["*"],
     )
+
+    set_routers(app)
 
     return app
 
