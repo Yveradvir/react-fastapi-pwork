@@ -1,4 +1,5 @@
-from backend.api_loader import *
+from config import _g
+from api_loader import *
 
 def makeapp() -> FastAPI:
     """
@@ -21,3 +22,9 @@ def makeapp() -> FastAPI:
     return app
 
 app = makeapp()
+
+
+@app.on_event("startup")
+async def on_startup():
+    db.init(_g("db_url"))
+    await db.init_models()
