@@ -1,6 +1,12 @@
-from loader import *
+from backend.api_loader import *
 
 def makeapp() -> FastAPI:
+    """
+    The function to launch FastApi application
+
+    Returns:
+        FastAPI: The launched FastAPI instance.
+    """
     app = FastAPI(debug=True)
 
     app.add_middleware(
