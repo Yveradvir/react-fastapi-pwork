@@ -12,7 +12,7 @@ class Database:
             self.init(url)
     
     def init(self, url):
-        self.engine = create_async_engine(url, echo=True)
+        self.engine = create_async_engine(url, echo=False)
         self.session = async_sessionmaker(self.engine, expire_on_commit=False)
 
     async def init_models(self):

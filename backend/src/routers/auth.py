@@ -62,7 +62,7 @@ async def signin(
 ) -> JSONResponse:
     user = (await session.execute(
         select(UserTable).where(UserTable.username == body.username)
-    )).one_or_none()
+    )).scalar_one_or_none()
 
     if user:
         uid = str(user.id)

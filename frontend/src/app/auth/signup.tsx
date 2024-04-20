@@ -7,6 +7,7 @@ import SpinnerButton from "@modules/components/submitspinner";
 import { SignUpSchema, SignUpValues } from "@modules/validations/auth.vd";
 import { LaunchedAxios } from "@modules/api/api";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
@@ -40,7 +41,13 @@ const SignUp: React.FC = () => {
                     setErrors(response.data.error)
                 }
             } catch (error) {
-                setErrors("error");
+                if (error instanceof AxiosError) {
+                    if (error.response?.data.detail) {
+                        setErrors(error.response.data.detail)
+                    } else {
+                        setErrors("Something went wrong . . .")
+                    }
+                }
             }
             
             actions.setSubmitting(false);

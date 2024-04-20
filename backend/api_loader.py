@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 
 from fastapi.routing import APIRoute, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.logger import logger
 
 from config import _g
 

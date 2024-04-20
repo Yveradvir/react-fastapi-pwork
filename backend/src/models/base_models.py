@@ -2,15 +2,15 @@ from base_loader import Dict
 from pydantic import BaseModel
 
 class BaseAdditionalsModel(BaseModel):
-    pass
+    loadUserProfile: bool = False
 
 class BaseRequestModel(BaseModel):
     pass
 
 class BaseResponseModel(BaseModel):
-    ok: bool
+    ok: bool = True
     subdata: Dict
-    additionals: BaseAdditionalsModel
+    additionals: BaseAdditionalsModel = BaseAdditionalsModel()
 
 __all__ = [
     "BaseAdditionalsModel", "BaseRequestModel", 

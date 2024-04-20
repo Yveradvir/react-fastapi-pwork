@@ -3,13 +3,13 @@ from sqlalchemy import Column
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio.engine import AsyncEngine, create_async_engine
 
-from sqlalchemy.types import Uuid, String, Integer, Boolean, LargeBinary, DateTime, Text
+from sqlalchemy.types import Uuid, String, Integer, Boolean, LargeBinary, DateTime, Text, Date
 from sqlalchemy.orm import declarative_base, DeclarativeBase
 from sqlalchemy.future import select
 
 from base_loader import *
 
-class TableBase(object):
+class InitialMixin(object):
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid4)
 
     created_at = Column(
@@ -33,9 +33,15 @@ class TableBase(object):
                     pass
                 else:
                     data[col.name] = None
+            # TODO: unlock it if it will be needed
+            # elif isinstance(col.type, (Date, DateTime)):
+            #     date_data = getattr(self, col.name)
+
+            #     data[col.name] = date_data
             else:
                 data[col.name] = getattr(self, col.name)
 
         return data
 
-Base = declarative_base(cls=TableBase)
+
+Base = declarative_base()
