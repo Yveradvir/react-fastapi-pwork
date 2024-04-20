@@ -3,7 +3,7 @@ from . import JwtConfig
 import json
 import jwt
 
-from fastapi import status, Response
+from fastapi import HTTPException, Request, status, Response
 from base_loader import *
 
 class JwtSecure:
@@ -221,4 +221,54 @@ class JwtSecure:
                 "error": data["error"]
             })
 
-    
+    def access_required(
+        self, request: Request
+    ) -> Dict:
+        """
+        Verify access token in request and match CSRF cookies with the token payload data.
+
+        Parameters:
+            request (Request): FastAPI request object.
+
+        Returns:
+            dictionary: {
+                payload: {
+                    iat: POSIX, 
+                    exp: iat + timedelta seconds, 
+                    csrf: encoded urlsafe
+                    and own payload/s... 
+                },
+                headers: {
+                    ...
+                }
+            }
+        """
+
+        # TEST IT LATER
+        _cget = request.cookies.get ; _hget = request.headers.get 
+        access = _cget(self.config.access_cookie_name, None)
+        
+        if access:
+            access_decoded = self.verify(access)
+
+            if access_decoded.get("data", None):
+                access_decoded = access_decoded["data"]
+
+                if _cget(
+                    self.config.access_csrf_cookie_name, None
+                ) == _hget(
+                    self.config.csrf_header_name, None
+                ) == access_decoded["payload"]["csrf"]:
+                    return access_decoded
+                else:
+                    raise HTTPException(
+                        status.HTTP_400_BAD_REQUEST, "CSRF tokens aren't match"
+                    )
+            else:
+                raise HTTPException(
+                    access_decoded["code"], access_decoded["error"]
+                )
+        else:
+            raise HTTPException(
+                status.HTTP_401_UNAUTHORIZED, "Access token is required but not provided"
+            )
