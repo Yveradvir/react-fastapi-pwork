@@ -1,4 +1,4 @@
-from base_loader import Dict
+from base_loader import Dict, Union
 from pydantic import BaseModel
 
 class BaseAdditionalsModel(BaseModel):
@@ -8,8 +8,11 @@ class BaseRequestModel(BaseModel):
     pass
 
 class BaseResponseModel(BaseModel):
+    class Subdata(BaseModel):
+        pass
+
     ok: bool = True
-    subdata: Dict
+    subdata: Union[Subdata, Dict] = Subdata()
     additionals: BaseAdditionalsModel = BaseAdditionalsModel()
 
 __all__ = [

@@ -2,7 +2,7 @@ from api_loader import *
 from base_loader import *
 
 from src.db.auth import UserTable
-from src.models.auth import AuthResponse, SignInRequest, SignUpRequest
+from src.models.auth import AuthResponse, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
 
@@ -36,6 +36,9 @@ async def signup(
                 AuthResponse(
                     subdata=AuthResponse.Subdata(
                         uuid=uid
+                    ),
+                    additionals=BaseAdditionalsModel(
+                        loadUserProfile=True
                     )
                 ).dict(), status.HTTP_201_CREATED
             )
@@ -74,6 +77,9 @@ async def signin(
                 AuthResponse(
                     subdata=AuthResponse.Subdata(
                         uuid=uid
+                    ),
+                    additionals=BaseAdditionalsModel(
+                        loadUserProfile=True
                     )
                 ).dict(), status.HTTP_200_OK
             )

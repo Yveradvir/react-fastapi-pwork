@@ -17,4 +17,4 @@ class AuthResponse(BaseResponseModel):
     class Subdata(BaseModel):
         uuid: str
 
-    subdata: Optional[Union[Subdata, Dict]]
+    subdata: Union[Subdata, Dict]
