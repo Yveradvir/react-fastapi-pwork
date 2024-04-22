@@ -98,17 +98,19 @@ class JwtSecure:
             token (str): JWT token to decode.
 
         Returns:
-            Dict[str, Dict]: Dictionary containing token header and payload.
+            Dict[str, Dict | bool]: Dictionary containing token header and payload.
         """
         headers: Dict[str, Any] = jwt.get_unverified_header(token)
         payload: Dict[str, Any] = jwt.decode(
             token, self.config.secret_key, algorithms=[self.config.algorithm]
         )
 
-        return {
-            "headers": headers,
-            "payload": payload
-        }
+        data = {"headers": headers, "payload": payload}
+
+        if data["headers"]["ttype"] == "access": 
+            data["triggered"] = data["payload"]["trg"]
+
+        return data
 
     def verify(
         self, token: str 
@@ -221,14 +223,15 @@ class JwtSecure:
                 "error": data["error"]
             })
 
-    def access_required(
-        self, request: Request
+    def jwt_required(
+        self, request: Request, ttype: str
     ) -> Dict:
         """
-        Verify access token in request and match CSRF cookies with the token payload data.
+        Verify the (type)-token is in request and match CSRF cookies with the token payload data.
 
         Parameters:
             request (Request): FastAPI request object.
+            ttype (str: access | refresh): Type of token
 
         Returns:
             dictionary: {
@@ -241,34 +244,45 @@ class JwtSecure:
                 headers: {
                     ...
                 }
+                triggered (if access): bool
             }
         """
-
-        # TEST IT LATER
         _cget = request.cookies.get ; _hget = request.headers.get 
-        access = _cget(self.config.access_cookie_name, None)
-        
-        if access:
-            access_decoded = self.verify(access)
+        token = _cget(
+            self.config.access_cookie_name
+            if ttype == "access" else
+            self.config.refresh_cookie_name, None
+        )
 
-            if access_decoded.get("data", None):
-                access_decoded = access_decoded["data"]
+        if token:
+            token_decoded = self.verify(token)
 
-                if _cget(
-                    self.config.access_csrf_cookie_name, None
-                ) == _hget(
-                    self.config.csrf_header_name, None
-                ) == access_decoded["payload"]["csrf"]:
-                    return access_decoded
+            if token_decoded.get("data", None):
+                token_decoded = token_decoded["data"]
+
+                cookie_csrf, header_csrf, payload_csrf = (
+                    _cget(
+                        self.config.access_csrf_cookie_name
+                        if ttype == "access" else
+                        self.config.refresh_csrf_cookie_name, None
+                    ), _hget(self.config.csrf_header_name, None),
+                    token_decoded["payload"]["csrf"]
+                )
+                
+                if cookie_csrf == header_csrf == payload_csrf:
+                    return token_decoded
                 else:
                     raise HTTPException(
                         status.HTTP_400_BAD_REQUEST, "CSRF tokens aren't match"
                     )
             else:
                 raise HTTPException(
-                    access_decoded["code"], access_decoded["error"]
+                    token_decoded["code"], token_decoded["error"]
                 )
         else:
             raise HTTPException(
-                status.HTTP_401_UNAUTHORIZED, "Access token is required but not provided"
+                status.HTTP_401_UNAUTHORIZED, f"{ttype.capitalize()} token is required but not provided"
             )
+        
+    def access_required(self, request: Request) -> Dict: return self.jwt_required(request, "access")
+    def refresh_required(self, request: Request) -> Dict: return self.jwt_required(request, "refresh")

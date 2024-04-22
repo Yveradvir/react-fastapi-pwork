@@ -5,6 +5,7 @@ import SignUp from "./auth/signup";
 import { Provider } from "react-redux";
 import { store } from "@modules/reducers";
 import SignIn from "./auth/signin";
+import Home from "./mainp/home";
 
 const App: React.FC = () => {
     return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
                     <Route path="/" element={<MainP/>} index/>
                     <Route path="/auth/signup" element={<SignUp/>} index/>
                     <Route path="/auth/signin" element={<SignIn/>} index/>
+                    <Route path="/home" element={<Home/>} index/>
                     <Route path="*" element={<NotFoundPage/>} index/>
                 </Routes>
             </BrowserRouter>

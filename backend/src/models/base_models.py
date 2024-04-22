@@ -12,8 +12,9 @@ class BaseResponseModel(BaseModel):
         pass
 
     ok: bool = True
-    subdata: Union[Subdata, Dict] = Subdata()
+    subdata: Union[Subdata, dict]
     additionals: BaseAdditionalsModel = BaseAdditionalsModel()
+
 
 __all__ = [
     "BaseAdditionalsModel", "BaseRequestModel", 

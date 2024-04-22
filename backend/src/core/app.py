@@ -1,7 +1,14 @@
+from contextlib import asynccontextmanager
 from config import _g
 from api_loader import *
-
 from .set_routers import set_routers
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db.init(_g("db_url"))
+    await db.init_models()
+
+    yield
 
 def makeapp() -> FastAPI:
     """
@@ -10,7 +17,7 @@ def makeapp() -> FastAPI:
     Returns:
         FastAPI: The launched FastAPI instance.
     """
-    app = FastAPI(debug=True)
+    app = FastAPI(debug=True, lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware, allow_credentials = True,
@@ -26,9 +33,3 @@ def makeapp() -> FastAPI:
     return app
 
 app = makeapp()
-
-
-@app.on_event("startup")
-async def on_startup():
-    db.init(_g("db_url"))
-    await db.init_models()

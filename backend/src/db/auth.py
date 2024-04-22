@@ -12,17 +12,7 @@ class UserTable(InitialMixin, db.base):
 
     password = Column(Text, nullable=False)
     email = Column(String(120), nullable=False, unique=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "username": self.username,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "birth": self.birth.isoformat(),
-            "email": self.email
-        }
-
+    
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 

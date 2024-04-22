@@ -1,4 +1,4 @@
-from sqlalchemy import Column
+from sqlalchemy import UUID, Column
 
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio.engine import AsyncEngine, create_async_engine
@@ -34,10 +34,11 @@ class InitialMixin(object):
                 else:
                     data[col.name] = None
             # TODO: unlock it if it will be needed
-            # elif isinstance(col.type, (Date, DateTime)):
-            #     date_data = getattr(self, col.name)
-
-            #     data[col.name] = date_data
+            elif isinstance(col.type, (Date, DateTime)):
+                date_data = getattr(self, col.name).isoformat()
+                data[col.name] = date_data
+            elif isinstance(col.type, (Uuid, UUID)):
+                data[col.name] = str(getattr(self, col.name))
             else:
                 data[col.name] = getattr(self, col.name)
 

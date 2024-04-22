@@ -1,6 +1,8 @@
 import axios from "axios";
 import cookies from '../cookies';
 import { yvesResponseOrNull } from "./additionals.api";
+import { store } from "@modules/reducers";
+import { getProfile } from "@modules/reducers/profile.slice";
 
 export const UnlaunchedAxios = axios.create({
     baseURL: import.meta.env.VITE_API, withCredentials: true
@@ -29,11 +31,13 @@ LaunchedAxios.interceptors.response.use(
     async response => {
         if (import.meta.env.DEV) console.log("[ LaunchedAxios:response::use#fulfilled > ", response);
 
-        const yvesponse = yvesResponseOrNull(response)
+        const yvesponse = yvesResponseOrNull(response);
         if (yvesponse) {
-            console.log("This is an yves response", yvesponse.loadUserProfile)
+            if (yvesponse.loadUserProfile) { 
+                await store.dispatch(getProfile())
+            }
         }
-
+        
         return response
     },
     async error => {

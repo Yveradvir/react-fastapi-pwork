@@ -40,7 +40,7 @@ async def signup(
                     additionals=BaseAdditionalsModel(
                         loadUserProfile=True
                     )
-                ).dict(), status.HTTP_201_CREATED
+                ).model_dump(), status.HTTP_201_CREATED
             )
             
             jwtsecure.set_access_cookie(response, str(access))
@@ -81,7 +81,7 @@ async def signin(
                     additionals=BaseAdditionalsModel(
                         loadUserProfile=True
                     )
-                ).dict(), status.HTTP_200_OK
+                ).model_dump(), status.HTTP_200_OK
             )
             
             jwtsecure.set_access_cookie(response, str(access))

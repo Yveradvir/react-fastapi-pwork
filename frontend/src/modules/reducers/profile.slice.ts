@@ -5,11 +5,14 @@ import { AxiosError } from "axios";
 export const PROFILE_FEATURE_KEY = "profile";
 
 export interface ProfileEntity {
+    id: string
     first_name: string
     last_name: string
     birth: string
     username: string
     email: string
+    created_at: string
+    updated_at: string
 }
 
 export interface CurrentProfileState {
@@ -25,7 +28,9 @@ export const getProfile = createAsyncThunk<ProfileEntity>(
             const response = await LaunchedAxios.get("/profile/my");
 
             if (response.data.ok) {
-                return response.data.subdata as ProfileEntity; 
+                console.log(response.data.subdata);
+                
+                return response.data.subdata 
             } else {
                 return thunkAPI.rejectWithValue("Response data not OK");
             }
