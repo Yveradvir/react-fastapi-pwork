@@ -1,5 +1,5 @@
 import axios from "axios";
-import cookies from '../cookies';
+import cookies from '../utils/cookies';
 import { yvesResponseOrNull } from "./additionals.api";
 import { store } from "@modules/reducers";
 import { getProfile } from "@modules/reducers/profile.slice";

@@ -8,6 +8,7 @@ import { SignUpSchema, SignUpValues } from "@modules/validations/auth.vd";
 import { LaunchedAxios } from "@modules/api/api";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import ImageLoader from "@modules/components/imageLoader";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
@@ -19,7 +20,8 @@ const SignUp: React.FC = () => {
         password: "",
         confirm_password: "",
         email: "",
-        birth: ""
+        birth: "",
+        profile_image: undefined
     };
 
     const onSubmitHandler = (values: SignUpValues, actions: FormikHelpers<SignUpValues>) => {
@@ -174,6 +176,11 @@ const SignUp: React.FC = () => {
                                             {(msg) => <Danger text={msg} />}
                                         </ErrorMessage>
                                     </Form.Group>
+
+                                    <ImageLoader 
+                                        field_name="profile_image"
+                                        label="Image of your profile"
+                                    />
 
                                     <SpinnerButton
                                         className="mt-2 w-100"

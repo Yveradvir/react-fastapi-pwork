@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, status, HTTPException
 
 from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from fastapi.routing import APIRoute, APIRouter
 from fastapi.middleware.cors import CORSMiddleware

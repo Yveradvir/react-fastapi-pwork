@@ -28,9 +28,7 @@ export const getProfile = createAsyncThunk<ProfileEntity>(
             const response = await LaunchedAxios.get("/profile/my");
 
             if (response.data.ok) {
-                console.log(response.data.subdata);
-                
-                return response.data.subdata 
+                return response.data.subdata as ProfileEntity 
             } else {
                 return thunkAPI.rejectWithValue("Response data not OK");
             }
