@@ -1,5 +1,6 @@
-from sqlalchemy import UUID, Column
+from sqlalchemy import UUID, Column, ForeignKey
 
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio.engine import AsyncEngine, create_async_engine
 

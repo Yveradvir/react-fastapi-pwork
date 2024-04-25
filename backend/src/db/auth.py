@@ -13,6 +13,8 @@ class UserTable(InitialMixin, db.base):
     password = Column(Text, nullable=False)
     email = Column(String(120), nullable=False, unique=True)
     
+    profile_image = relationship("ProfileImageTable", uselist=False, backref="users")
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
