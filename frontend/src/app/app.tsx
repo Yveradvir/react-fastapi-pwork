@@ -6,6 +6,7 @@ import SignIn from "./auth/signin";
 import { Suspense, lazy } from "react";
 import MainP from "./mainp/mainp";
 import ErrorPage from "@modules/components/errorPage";
+import Layout from "@modules/components/layout";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 
@@ -25,7 +26,16 @@ const App: React.FC = () => {
                             </Suspense>
                         }
                     />
-                    <Route path="*" element={<ErrorPage />} />
+                    <Route path="*" element={
+                        <Layout>
+                            <ErrorPage>
+                                <p className="lead">
+                                    The page you are looking for might have been removed, had
+                                    its name changed, or is temporarily unavailable.
+                                </p>
+                            </ErrorPage>
+                        </Layout>
+                    } />
                 </Routes>
             </BrowserRouter>
         </Provider>

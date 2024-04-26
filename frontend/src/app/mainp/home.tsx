@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "@modules/reducers";
 import { LoadingStatus } from "@modules/reducers/main";
 import { getProfile } from "@modules/reducers/profile.slice";
 import { useEffect } from "react";
-import { Card, Row } from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 
 const Home: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -27,11 +27,13 @@ const Home: React.FC = () => {
             ) : (
                 profile && (
                     <Card>
-                        <Row>
-                            <ProfileImage uid={profile.id as string} />
-                        </Row>
-                        <Row>
-                            <h1>Welcome, {profile.first_name} {profile.last_name}</h1>
+                        <Row className="m-2">
+                            <Col xs={3}>
+                                <ProfileImage uid={profile.id as string} />
+                            </Col>
+                            <Col>
+                                <h1>Welcome, {profile.first_name} {profile.last_name}</h1>
+                            </Col>
                         </Row>
                     </Card>
                 )

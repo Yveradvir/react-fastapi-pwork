@@ -15,8 +15,10 @@ class BaseResponseModel(BaseModel):
     subdata: Union[Subdata, dict]
     additionals: BaseAdditionalsModel = BaseAdditionalsModel()
 
+class Subdated(BaseResponseModel):
+    subdata: dict
 
 __all__ = [
     "BaseAdditionalsModel", "BaseRequestModel", 
-    "BaseResponseModel", "BaseModel"
+    "BaseResponseModel", "BaseModel", "Subdated"
 ]

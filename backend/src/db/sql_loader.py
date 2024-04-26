@@ -1,3 +1,5 @@
+from base64 import b64decode, b64encode
+
 from sqlalchemy import UUID, Column, ForeignKey
 
 from sqlalchemy.orm import relationship
@@ -30,11 +32,11 @@ class InitialMixin(object):
             if isinstance(col.type, LargeBinary):
                 binary_data = getattr(self, col.name)
                 if binary_data:
-                    # TODO: i will handle large binary data when come to it
-                    pass
+                    data[col.name] = b64encode(
+                        getattr(self, col.name)
+                    ).decode()
                 else:
                     data[col.name] = None
-            # TODO: unlock it if it will be needed
             elif isinstance(col.type, (Date, DateTime)):
                 date_data = getattr(self, col.name).isoformat()
                 data[col.name] = date_data

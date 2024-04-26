@@ -40,11 +40,11 @@ export const getProfile = createAsyncThunk<ProfileEntity>(
     }
 );
 
-export const getProfileImage = createAsyncThunk<string, RejectedError>(
+export const getProfileImage = createAsyncThunk<string, string>(
     "profile/image",
     async (uid, thunkAPI) => {
         try {
-            const response = await LaunchedAxios.get(`/profile/signle/${uid}/image`);
+            const response = await LaunchedAxios.get(`/profile/single/${uid}/image`);
     
             if (response.data.ok) {
                 return response.data.subdata.result as string 

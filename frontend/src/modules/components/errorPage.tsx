@@ -11,10 +11,7 @@ interface ErrorPageProps {
 const ErrorPage: React.FC<ErrorPageProps> = ({
     status_code = 404,
     initial_message = "Oops! Page Not Found",
-    children = (<p className="lead">
-        The page you are looking for might have been removed, had
-        its name changed, or is temporarily unavailable.
-    </p>)
+    children
 }) => {
     const navigate = useNavigate();
 

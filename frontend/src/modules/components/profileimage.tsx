@@ -10,7 +10,7 @@ interface ProfileImageProps {
     h?: number;
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=128, h=128 }) => {
+const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=64, h=64 }) => {
     const dispatch = useAppDispatch();
     const selector = useAppSelector((state) => state);
 
@@ -33,10 +33,21 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=128, h=128 }) => {
     const profileB64 = selector.profile.profile?.profile_b64;
 
     if (selector.profile.profileImageStatus === LoadingStatus.Loaded) {
+        if (!selector.profile.profile?.profile_b64) {
+            return (
+                <div>
+                    <img 
+                        src={`https://static-00.iconduck.com/assets.00/user-avatar-1-icon-511x512-ynet6qk9.png`} 
+                        alt="Profile" 
+                        style={{ borderRadius: "50%", width: `${w}px`, height: `${h}px` }} 
+                    />
+                </div>                
+            );
+        }
         return (
             <div>
                 <img 
-                    src={`data:image/jpeg;base64,${profileB64}`} 
+                    src={`${profileB64}`} 
                     alt="Profile" 
                     style={{ borderRadius: "50%", width: `${w}px`, height: `${h}px` }} 
                 />
