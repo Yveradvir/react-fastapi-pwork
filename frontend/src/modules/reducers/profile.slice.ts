@@ -1,7 +1,6 @@
 import { LaunchedAxios } from "@modules/api/api";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
-import { LoadingStatus } from "./loadstatus";
+import { LoadingStatus, ReduxRejfullTools, RejectedError } from "./main";
 
 export const PROFILE_FEATURE_KEY = "profile";
 
@@ -20,7 +19,8 @@ export interface ProfileEntity {
 export interface CurrentProfileState {
     profile: ProfileEntity | null;
     loadingStatus: LoadingStatus;
-    error?: string | null;
+    profileImageStatus: LoadingStatus;
+    error?: RejectedError | null;
 }
 
 export const getProfile = createAsyncThunk<ProfileEntity>(
@@ -32,21 +32,15 @@ export const getProfile = createAsyncThunk<ProfileEntity>(
             if (response.data.ok) {
                 return response.data.subdata as ProfileEntity 
             } else {
-                return thunkAPI.rejectWithValue("Response data not OK");
+                return thunkAPI.rejectWithValue(ReduxRejfullTools.standartReject());
             }
         } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.response){
-                    return thunkAPI.rejectWithValue(error.response.data.detail);
-                }
-            }
-
-            return thunkAPI.rejectWithValue("Something went wrong")
+            return thunkAPI.rejectWithValue(ReduxRejfullTools.standartAxiosReject(error));
         }
     }
 );
 
-export const getProfileImage = createAsyncThunk<string, string>(
+export const getProfileImage = createAsyncThunk<string, RejectedError>(
     "profile/image",
     async (uid, thunkAPI) => {
         try {
@@ -55,25 +49,23 @@ export const getProfileImage = createAsyncThunk<string, string>(
             if (response.data.ok) {
                 return response.data.subdata.result as string 
             } else {
-                return thunkAPI.rejectWithValue("Response data not OK");
+                return thunkAPI.rejectWithValue({
+                    status_code: 500
+                });
             }
         } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.response){
-                    return thunkAPI.rejectWithValue(error.response.data.detail);
-                }
-            }
 
             return thunkAPI.rejectWithValue("Something went wrong")
         }
     }
 )
 
-const csrfSlice = createSlice({
+const profileSlice = createSlice({
     name: PROFILE_FEATURE_KEY,
     initialState: {
         profile: null,
         loadingStatus: LoadingStatus.NotLoaded,
+        profileImageStatus: LoadingStatus.NotLoaded,
         error: null,
     } as CurrentProfileState,
     reducers: {},
@@ -92,9 +84,14 @@ const csrfSlice = createSlice({
                     state.loadingStatus = LoadingStatus.Loaded;
                 }
             )
+            .addCase(getProfileImage.pending, (state: CurrentProfileState) => {
+                state.profileImageStatus = LoadingStatus.Loading;
+            })
             .addCase(getProfile.rejected, (state: CurrentProfileState, action) => {
+                console.log(action);
+                
                 state.loadingStatus = LoadingStatus.Error;
-                state.error = action.error.message;
+                state.error = action.payload as RejectedError;
             })
             .addCase(
                 getProfileImage.fulfilled,
@@ -104,15 +101,16 @@ const csrfSlice = createSlice({
                 ) => {
                     if (state.profile) {
                         state.profile.profile_b64 = action.payload;
+                        state.profileImageStatus = LoadingStatus.Loaded;
                     }
                 }
             )
             .addCase(getProfileImage.rejected, (state: CurrentProfileState, action) => {
-                state.loadingStatus = LoadingStatus.Error;
-                state.error = action.error.message;
+                state.profileImageStatus = LoadingStatus.Error;
+                state.error = action.payload as RejectedError;
             });
     },
 });
 
-export const profileReducer = csrfSlice.reducer;
-export const profileActions = csrfSlice.actions;
+export const profileReducer = profileSlice.reducer;
+export const profileActions = profileSlice.actions;

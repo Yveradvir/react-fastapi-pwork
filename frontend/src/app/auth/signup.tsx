@@ -9,6 +9,7 @@ import { LaunchedAxios } from "@modules/api/api";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import ImageLoader from "@modules/components/imageLoader";
+import blobToBase64 from "@modules/utils/blob";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
@@ -33,6 +34,13 @@ const SignUp: React.FC = () => {
                 const { confirm_password, ...body } = values;
                 
                 body.birth = new Date(body.birth).toISOString()
+
+                if (body.profile_image && body.profile_image instanceof File) {
+                    body.profile_image = await blobToBase64(
+                        new Blob([body.profile_image], {type: body.profile_image.type})
+                    )
+                }
+
                 console.log(body);
                 
                 const response = await LaunchedAxios.post("/auth/signup", body)

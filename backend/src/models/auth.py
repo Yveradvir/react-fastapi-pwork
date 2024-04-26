@@ -8,6 +8,7 @@ class SignUpRequest(BaseRequestModel):
     username: str
     password: str
     email: str
+    profile_image: Optional[str]
 
 class SignInRequest(BaseRequestModel):
     username: str

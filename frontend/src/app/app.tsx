@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import NotFoundPage from "@modules/components/p404";
 import SignUp from "./auth/signup";
 import { Provider } from "react-redux";
 import { store } from "@modules/reducers";
 import SignIn from "./auth/signin";
 import { Suspense, lazy } from "react";
 import MainP from "./mainp/mainp";
+import ErrorPage from "@modules/components/errorPage";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 
@@ -25,7 +25,7 @@ const App: React.FC = () => {
                             </Suspense>
                         }
                     />
-                    <Route path="*" element={<NotFoundPage />} />
+                    <Route path="*" element={<ErrorPage />} />
                 </Routes>
             </BrowserRouter>
         </Provider>

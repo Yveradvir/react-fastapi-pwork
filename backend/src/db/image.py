@@ -5,6 +5,7 @@ class ProfileImageTable(InitialMixin, db.base):
     __tablename__ = "profileimages"
 
     image = Column(LargeBinary, nullable=True)
+    first = Column(String, nullable=True)
     user_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
 
     def __init__(self, **kwargs) -> None:

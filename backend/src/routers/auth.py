@@ -2,6 +2,7 @@ from api_loader import *
 from base_loader import *
 
 from src.db.auth import UserTable
+from src.db.image import ProfileImageTable
 from src.models.auth import AuthResponse, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
@@ -22,7 +23,12 @@ async def signup(
         if not is_email_taken:
             body.password = password.hash(body.password)
             body.birth = datetime.strptime(body.birth, "%Y-%m-%dT%H:%M:%S.%fZ")
-            new_user = UserTable(**body.dict())
+            
+            _user_body = body.model_dump()
+            _user_body.pop("profile_image")
+
+            print(_user_body)
+            new_user = UserTable(**_user_body) 
 
             session.add(new_user)
             await session.commit()

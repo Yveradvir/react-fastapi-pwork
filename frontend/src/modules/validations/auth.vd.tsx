@@ -8,7 +8,7 @@ export interface SignUpValues {
     last_name: string;
     email: string;
     birth: string;
-    profile_image: File | undefined; 
+    profile_image: File | string | undefined; 
 }
 
 export interface SignInValues {
