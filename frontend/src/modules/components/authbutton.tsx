@@ -9,7 +9,7 @@ interface AuthButtonProps {
     variant: "primary" | "outline-primary";
 }
 
-const AuthButton: React.FC<AuthButtonProps> = ({
+const DownButtons: React.FC<AuthButtonProps> = ({
     text,
     to,
     currentPath,
@@ -31,4 +31,4 @@ const AuthButton: React.FC<AuthButtonProps> = ({
     );
 };
 
-export default AuthButton;
+export default DownButtons;

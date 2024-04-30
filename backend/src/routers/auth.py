@@ -1,8 +1,7 @@
 from api_loader import *
 from base_loader import *
 
-from src.db.auth import UserTable
-from src.db.image import ProfileImageTable
+from src.db.auth import UserTable, ProfileImageTable
 from src.models.auth import AuthResponse, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
