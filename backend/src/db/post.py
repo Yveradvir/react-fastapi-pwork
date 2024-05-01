@@ -17,7 +17,11 @@ class PostPropsTable(InitialMixin, db.base):
     __tablename__ = "postprops"
 
     post_id = Column(Uuid(as_uuid=True), ForeignKey('posts.id'))
-    price = Column(Integer)
+    rank = Column(String)
+
+    # For social media
+    mainly_link = Column(String)
+    secondly_link = Column(String)
 
 
 class PostImagesTable(InitialMixin, db.base):

@@ -1,17 +1,11 @@
-import React, { useState } from "react";
-import {
-    Button,
-    ButtonGroup,
-    Grid,
-    FormControl,
-    FormHelperText,
-    InputLabel,
-} from "@mui/material";
-import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
-import Danger from "./danger";
-import blobToBase64 from "@modules/utils/blob";
-import ImageModal from "@modules/modals/image.modal";
-import { CgClose, CgImage } from "react-icons/cg";
+import React, { useState } from 'react';
+import { Button, ButtonGroup, FormControl, FormHelperText, Grid, InputLabel } from '@mui/material';
+import { ErrorMessage, Field, useFormikContext } from 'formik';
+import Danger from './danger';
+import blobToBase64 from '@modules/utils/blob';
+import ImageModal from '@modules/modals/image.modal';
+import { CgClose, CgImage } from 'react-icons/cg';
+import { MuiFileInput } from 'mui-file-input';
 
 interface ImageLoaderProps {
     field_name: string;
@@ -19,8 +13,8 @@ interface ImageLoaderProps {
 }
 
 const ImageLoader: React.FC<ImageLoaderProps> = ({ field_name, label }) => {
-    const { setFieldValue } = useFormikContext<FormikValues>();
-    const [imageUrl, setImageUrl] = useState<string>("");
+    const { setFieldValue } = useFormikContext();
+    const [imageUrl, setImageUrl] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const handleCloseModal = () => {
@@ -34,35 +28,27 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({ field_name, label }) => {
                     <FormControl fullWidth>
                         <InputLabel>{label}</InputLabel>
                         <Field
-                            type="file"
+                            inputProps={{ accept: "image/png, image/gif, image/jpeg" }}
+                            size="small"                
                             name={field_name}
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                                const file =
-                                    e.target.files && e.target.files[0];
+                            value={undefined}
+                            onChange={(file: BlobPart) => {
                                 if (file instanceof File) {
                                     setFieldValue(field_name, file);
-                                    blobToBase64(
-                                        new Blob([file], { type: file.type })
-                                    )
+                                    blobToBase64(new Blob([file], { type: file.type }))
                                         .then((b64) => {
                                             setImageUrl(b64);
                                         })
                                         .catch((error) => {
-                                            console.error(
-                                                "Error converting file to Base64:",
-                                                error
-                                            );
+                                            console.error('Error converting file to Base64:', error);
                                         });
                                 }
                             }}
-                            value={undefined}
-                            as={FormControl}
+                            as={MuiFileInput}
                         />
                         <FormHelperText>
-                            <ErrorMessage name={field_name}> 
-                                {(msg) => <Danger text={msg}/>}
+                            <ErrorMessage name={field_name}>
+                                {(msg) => <Danger text={msg} />}
                             </ErrorMessage>
                         </FormHelperText>
                     </FormControl>
@@ -71,10 +57,8 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({ field_name, label }) => {
                     <ButtonGroup>
                         <Button
                             variant="outlined"
-                            onClick={() => {
-                                console.log(imageUrl);
-                                setIsModalOpen(true);
-                            }}
+                            onClick={() => setIsModalOpen(true)}
+                            disabled={!imageUrl}
                         >
                             <CgImage />
                         </Button>
@@ -82,8 +66,9 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({ field_name, label }) => {
                             variant="outlined"
                             onClick={() => {
                                 setFieldValue(field_name, undefined);
-                                setImageUrl("");
+                                setImageUrl('');
                             }}
+                            disabled={!imageUrl}
                         >
                             <CgClose />
                         </Button>

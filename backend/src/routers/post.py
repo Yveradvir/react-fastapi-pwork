@@ -13,6 +13,7 @@ subrouter = APIRouter(prefix="/single")
 
 @router.post("/new", status_code=status.HTTP_201_CREATED)
 async def new_post(
-    request: Request, body: SignUpRequest,
+    request: Request, body: ,
     session: AsyncSession = Depends(db.get_session)
 ):
+    pass

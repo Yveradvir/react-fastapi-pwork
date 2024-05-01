@@ -1,3 +1,6 @@
+import dayjs  from "dayjs";
+import utc from 'dayjs/plugin/utc';
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SignUp from "./auth/signup";
 import { Provider } from "react-redux";
@@ -9,6 +12,8 @@ import ErrorPage from "@modules/components/errorPage";
 import Layout from "@modules/components/layout";
 
 const LazyHome = lazy(() => import("./mainp/home"));
+
+dayjs.extend(utc);
 
 const App: React.FC = () => {
     return (

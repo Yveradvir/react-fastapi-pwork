@@ -85,7 +85,7 @@ const SignUp: React.FC = () => {
                 validationSchema={SignUpSchema}
                 onSubmit={onSubmitHandler}
             >
-                {({ isSubmitting }) => (
+                {({ isSubmitting, values }) => (
                     <FForm noValidate>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
@@ -183,6 +183,8 @@ const SignUp: React.FC = () => {
                             type="submit"
                             text="Submit"
                             isSubmitting={isSubmitting}
+                            onClick={() => console.log(values)
+                            }
                         />
                         {error && <Danger text={error} />}
                     </FForm>
