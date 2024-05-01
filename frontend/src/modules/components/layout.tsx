@@ -1,9 +1,9 @@
 import React from 'react';
-import { Container } from "react-bootstrap";
-import Header from "./header";
+import Container from '@mui/material/Container';
+import Header from './header';
 
 interface Props {
-    children: React.ReactNode
+    children: React.ReactNode;
 }
 
 const Layout: React.FC<Props> = ({ children }) => {
@@ -15,6 +15,6 @@ const Layout: React.FC<Props> = ({ children }) => {
             </Container>
         </div>
     );
-} 
+};
 
 export default Layout;

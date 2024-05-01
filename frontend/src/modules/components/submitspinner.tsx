@@ -1,23 +1,18 @@
 import React from "react";
-import { Button, ButtonProps, Spinner } from "react-bootstrap";
+import Button, { ButtonProps } from '@mui/material/Button'; 
+import CircularProgress from '@mui/material/CircularProgress';
 
-interface SpinnerButtonProps {
+interface SpinnerButtonProps extends ButtonProps { 
     isSubmitting: boolean;
     text: string;
 }
 
-const SpinnerButton: React.FC<SpinnerButtonProps & ButtonProps> = ({ isSubmitting, text, ...rest }) => {
+const SpinnerButton: React.FC<SpinnerButtonProps> = ({ isSubmitting, text, ...rest }) => {
     return (
-        <Button variant="primary" disabled={isSubmitting} {...rest}>
+        <Button variant="contained" disabled={isSubmitting} {...rest}>
             {isSubmitting ? (
                 <>
-                    <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                    />
+                    <CircularProgress size={20} color="inherit" />
                     <span className="visually-hidden">Loading...</span>
                 </>
             ) : (

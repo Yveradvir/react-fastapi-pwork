@@ -1,15 +1,15 @@
 import React from "react";
-import { Button } from "react-bootstrap";
+import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 
 interface AuthButtonProps {
     text: string;
     to: string;
     currentPath: string;
-    variant: "primary" | "outline-primary";
+    variant: "contained" | "outlined";
 }
 
-const DownButtons: React.FC<AuthButtonProps> = ({
+const AuthButton: React.FC<AuthButtonProps> = ({
     text,
     to,
     currentPath,
@@ -21,9 +21,15 @@ const DownButtons: React.FC<AuthButtonProps> = ({
         navigate(to);
     };
 
+    const getColor = (): "inherit" | "primary" | "secondary" | "info" | "success" | "warning" | "error" => {
+        return currentPath === to ? "primary" : "inherit";
+    }
+    
+
     return (
         <Button
-            variant={`${variant} ${currentPath === to ? "active" : ""}`}
+            variant={variant}
+            color={getColor()}
             onClick={handleClick}
         >
             {text}
@@ -31,4 +37,4 @@ const DownButtons: React.FC<AuthButtonProps> = ({
     );
 };
 
-export default DownButtons;
+export default AuthButton;

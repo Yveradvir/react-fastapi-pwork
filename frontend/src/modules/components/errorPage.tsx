@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import Button from "@mui/material/Button";
 
 interface ErrorPageProps {
     status_code?: number;
@@ -38,6 +38,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                 onClick={() => {
                     navigate(-1);
                 }}
+                variant="contained"
+                color="primary"
             >
                 Go back to previous
             </Button>

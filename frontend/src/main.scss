@@ -20,39 +20,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-
-$primary: #2d915a;
-
-$theme-colors: map-merge($theme-colors, (
-  "primary": $primary
-));
-
-@import "bootstrap/scss/bootstrap";
-.btn-primary {
-  @include button-variant(
-    $primary,
-    $primary,
-    $gray-100,
-    darken($primary, 10%),
-    darken($primary, 10%),
-    $gray-100
-  );
-}
-
-.nav-pills .nav-link {
-  transition: .1s all ease-in;
-  border-radius: 22px;
-
-  & {
-    color: $primary;
-    border-radius: 12px;
-  }
-  &.active, &:hover {
-    background-color: $primary;
-    color: $gray-100; 
-    border-radius: 24px;
-  }
-}

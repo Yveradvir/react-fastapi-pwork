@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Nav, ButtonGroup } from "react-bootstrap";
+import { Container, Grid, ButtonGroup } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import AuthButton from "./authbutton";
 
@@ -22,49 +22,30 @@ const Header: React.FC = () => {
     return (
         <Container>
             <header className="py-4">
-                <Row className="align-items-center">
-                    <Col
-                        xs={8}
-                        className="d-flex justify-content-between align-items-center"
-                    >
+                <Grid container alignItems="center">
+                    <Grid item xs={8} className="d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center">
                             <h1 className="text-primary mb-0">OcoolO</h1>
                         </div>
-                        <Nav className="nav-pills ms-3">
-                            {navs.map((nav, index) => (
-                                <Nav.Item key={index}>
-                                    <Nav.Link
-                                        as={Link}
-                                        to={nav.to}
-                                        className={
-                                            currUrl.pathname === nav.to
-                                                ? "active"
-                                                : ""
-                                        }
-                                    >
-                                        {nav.text}
-                                    </Nav.Link>
-                                </Nav.Item>
-                            ))}
-                        </Nav>
-                    </Col>
-                    <Col xs={4} className="text-end ">
+                        <nav>
+                            <ul className="nav-pills ms-3">
+                                {navs.map((nav, index) => (
+                                    <li key={index}>
+                                        <Link to={nav.to} className={currUrl.pathname === nav.to ? "active" : ""}>
+                                            {nav.text}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </Grid>
+                    <Grid item xs={4} className="text-end">
                         <ButtonGroup className="ml-3 px-4">
-                            <AuthButton
-                                text="Sign In"
-                                to="/auth/signin"
-                                currentPath={currUrl.pathname}
-                                variant="outline-primary"
-                            />
-                            <AuthButton
-                                text="Sign Up"
-                                to="/auth/signup"
-                                currentPath={currUrl.pathname}
-                                variant="outline-primary"
-                            />
+                            <AuthButton text="Sign In" to="/auth/signin" currentPath={currUrl.pathname} variant="outlined" />
+                            <AuthButton text="Sign Up" to="/auth/signup" currentPath={currUrl.pathname} variant="outlined" />
                         </ButtonGroup>
-                    </Col>
-                </Row>
+                    </Grid>
+                </Grid>
             </header>
         </Container>
     );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Typography } from "@mui/material";
 
 interface ImageModalProps {
     show: boolean;
@@ -13,25 +13,25 @@ const ImageModal: React.FC<ImageModalProps> = ({
     onClose,
 }) => {
     return (
-        <Modal show={show} onHide={onClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Preview</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {imageUrl && (
-                    <img
-                        src={imageUrl}
-                        alt="Selected Image"
-                        style={{ maxWidth: "100%", height: "auto" }}
-                    />
-                )}
-                <p>This image you have picked</p>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="primary" onClick={onClose}>
-                    Ok
-                </Button>
-            </Modal.Footer>
+        <Modal open={show} onClose={onClose}>
+            <div style={{ backgroundColor: "#fff", padding: "1rem", maxWidth: "600px", margin: "auto", marginTop: "20vh" }}>
+                <Typography variant="h6" align="center" gutterBottom>Preview</Typography>
+                <div style={{ textAlign: "center" }}>
+                    {imageUrl && (
+                        <img
+                            src={imageUrl}
+                            alt="Selected Image"
+                            style={{ maxWidth: "100%", height: "auto" }}
+                        />
+                    )}
+                </div>
+                <Typography variant="body1" align="center">This image you have picked</Typography>
+                <div style={{ textAlign: "center", marginTop: "1rem" }}>
+                    <Button variant="contained" color="primary" onClick={onClose}>
+                        Ok
+                    </Button>
+                </div>
+            </div>
         </Modal>
     );
 };
