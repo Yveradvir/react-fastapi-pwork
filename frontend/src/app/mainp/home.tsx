@@ -27,12 +27,12 @@ const Home: React.FC = () => {
             ) : (
                 profile && (
                     <Card>
-                        <Grid container spacing={2} className="m-2">
-                            <Grid item xs={3}>
-                                <ProfileImage uid={profile.id as string} />
+                        <Grid container spacing={2} className="m-2" alignItems="center">
+                            <Grid item xs={3} style={{ display: "flex", justifyContent: "center" }}>
+                                <ProfileImage uid={profile.id as string} w={100} h={100} />
                             </Grid>
                             <Grid item xs={9}>
-                                <Typography variant="h1">
+                                <Typography variant="h4">
                                     Welcome, {profile.first_name} {profile.last_name}
                                 </Typography>
                             </Grid>
@@ -45,3 +45,4 @@ const Home: React.FC = () => {
 }
 
 export default Home;
+ 

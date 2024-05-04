@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@modules/reducers";
 import { LoadingStatus } from "@modules/reducers/main";
 import { getProfileImage } from "@modules/reducers/profile.slice";
-import { MutatingDots } from "react-loader-spinner";
+import { Avatar, CircularProgress } from "@mui/material";
 
 interface ProfileImageProps {
     uid: string;
@@ -10,7 +10,7 @@ interface ProfileImageProps {
     h?: number;
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=64, h=64 }) => {
+const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w = 64, h = 64 }) => {
     const dispatch = useAppDispatch();
     const selector = useAppSelector((state) => state);
 
@@ -18,8 +18,9 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=64, h=64 }) => {
         let is_ignore = false;
 
         if (!is_ignore) {
-            if (!selector.profile.profile?.profile_b64 
-                && selector.profile.profileImageStatus === LoadingStatus.NotLoaded
+            if (
+                !selector.profile.profile?.profile_b64 &&
+                selector.profile.profileImageStatus === LoadingStatus.NotLoaded
             ) {
                 dispatch(getProfileImage(uid));
             }
@@ -27,7 +28,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=64, h=64 }) => {
 
         return () => {
             is_ignore = true;
-        }
+        };
     }, [dispatch, selector.profile.profile?.profile_b64, selector.profile.profileImageStatus, uid]);
 
     const profileB64 = selector.profile.profile?.profile_b64;
@@ -35,32 +36,28 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w=64, h=64 }) => {
     if (selector.profile.profileImageStatus === LoadingStatus.Loaded) {
         if (!selector.profile.profile?.profile_b64) {
             return (
-                <div>
-                    <img 
-                        src={`https://static-00.iconduck.com/assets.00/user-avatar-1-icon-511x512-ynet6qk9.png`} 
-                        alt="Profile" 
-                        style={{ borderRadius: "50%", width: `${w}px`, height: `${h}px` }} 
-                    />
-                </div>                
+                <Avatar
+                    alt="Profile"
+                    src="https://static-00.iconduck.com/assets.00/user-avatar-1-icon-511x512-ynet6qk9.png"
+                    style={{ width: w, height: h }}
+                />
             );
         }
         return (
-            <div>
-                <img 
-                    src={`${profileB64}`} 
-                    alt="Profile" 
-                    style={{ borderRadius: "50%", width: `${w}px`, height: `${h}px` }} 
-                />
-            </div>
+            <Avatar
+                alt="Profile"
+                src={profileB64}
+                style={{ width: w, height: h }}
+            />
         );
     } else if (selector.profile.profileImageStatus === LoadingStatus.Loading) {
         return (
-            <MutatingDots
-                width={w}
-                height={h}
+            <CircularProgress
+                size={Math.min(w, h)}
             />
         );
     }
-}
+    return null;
+};
 
 export default ProfileImage;

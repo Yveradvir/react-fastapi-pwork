@@ -79,7 +79,7 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <Layout>
+        <Layout needToFab={false}>
             <Formik
                 initialValues={initialValues}
                 validationSchema={SignUpSchema}

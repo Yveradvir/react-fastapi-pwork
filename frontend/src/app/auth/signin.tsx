@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, TextField } from "@mui/material";
+import { Grid, TextField, Typography } from "@mui/material";
 import {
     Formik,
     Field,
@@ -21,7 +21,7 @@ const SignIn: React.FC = () => {
     const initialValues: SignInValues = {
         username: "",
         password: "",
-        confirm_password: ""
+        confirm_password: "",
     };
 
     const onSubmitHandler = (
@@ -33,74 +33,91 @@ const SignIn: React.FC = () => {
         const _ = async () => {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const {confirm_password, ...body} = values
+                const { confirm_password, ...body } = values;
                 const response = await LaunchedAxios.post("/auth/signin", body);
                 
                 if (response.data.ok) {
-                    navigate("/home")
+                    navigate("/home");
                 } else {
-                    setErrors(response.data.error)
+                    setErrors(response.data.error);
                 }
             } catch (error) {
                 if (error instanceof AxiosError) {
                     if (error.response?.data.detail) {
-                        setErrors(error.response.data.detail)
+                        setErrors(error.response.data.detail);
                     } else {
-                        setErrors("Something went wrong . . .")
+                        setErrors("Something went wrong . . .");
                     }
                 }
             }
             
             actions.setSubmitting(false);
-        }
+        };
 
         _();
     };
 
     return (
-        <Layout>
-            <Formik
-                initialValues={initialValues}
-                validationSchema={SignInSchema}
-                onSubmit={onSubmitHandler}
-            >
-                {({ isSubmitting }) => (
-                    <FForm noValidate>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <Field
-                                    name="username"
-                                    type="text"
-                                    as={TextField}
-                                    label="Username"
-                                    fullWidth
-                                />
-                                <ErrorMessage name="username">
-                                    {(msg) => <Danger text={msg} />}
-                                </ErrorMessage>
+        <Layout needToFab={false}>
+            <div className="frame">
+                <Typography variant="h5" gutterBottom>
+                    Sign In
+                </Typography>
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={SignInSchema}
+                    onSubmit={onSubmitHandler}
+                >
+                    {({ isSubmitting }) => (
+                        <FForm noValidate>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Field
+                                        name="username"
+                                        type="text"
+                                        as={TextField}
+                                        label="Username"
+                                        fullWidth
+                                    />
+                                    <ErrorMessage name="username">
+                                        {(msg) => <Danger text={msg} />}
+                                    </ErrorMessage>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Field
+                                        name="password"
+                                        type="password"
+                                        as={TextField}
+                                        label="Password"
+                                        fullWidth
+                                    />
+                                    <ErrorMessage name="password">
+                                        {(msg) => <Danger text={msg} />}
+                                    </ErrorMessage>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Field
+                                        name="confirm_password"
+                                        type="password"
+                                        as={TextField}
+                                        label="Confirm Password"
+                                        fullWidth
+                                    />
+                                    <ErrorMessage name="confirm_password">
+                                        {(msg) => <Danger text={msg} />}
+                                    </ErrorMessage>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Field
-                                    name="password"
-                                    type="password"
-                                    as={TextField}
-                                    label="Password"
-                                    fullWidth
-                                />
-                                <ErrorMessage name="password">
-                                    {(msg) => <Danger text={msg} />}
-                                </ErrorMessage>
-                            </Grid>
-                        </Grid>
-                        <SpinnerButton
-                            type="submit"
-                            text="Sign In"
-                            isSubmitting={isSubmitting}
-                        />
-                        {error && <Danger text={error} />}
-                    </FForm>
-                )}
-            </Formik>
+                            <SpinnerButton
+                                type="submit"
+                                text="Sign In"
+                                isSubmitting={isSubmitting}
+                            />
+                            {error && <Danger text={error} />}
+                        </FForm>
+                    )}
+                </Formik>
+            </div>
         </Layout>
     );
 };
