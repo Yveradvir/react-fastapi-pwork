@@ -1,0 +1,1 @@
+export type YvesFile = File | Blob | string

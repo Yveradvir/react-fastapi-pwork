@@ -29,7 +29,7 @@ const SignUp: React.FC = () => {
         confirm_password: "",
         email: "",
         birth: "",
-        profile_image: undefined,
+        profile_image: "",
     };
 
     const onSubmitHandler = (

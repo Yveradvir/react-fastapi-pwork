@@ -34,4 +34,4 @@ class PostImagesTable(InitialMixin, db.base):
     second = Column(LargeBinary, nullable=True)
     third = Column(LargeBinary, nullable=True)
     fourth = Column(LargeBinary, nullable=True)
-    fifht = Column(LargeBinary, nullable=True)
+    fifth = Column(LargeBinary, nullable=True)

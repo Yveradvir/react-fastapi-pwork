@@ -10,6 +10,7 @@ import { Suspense, lazy } from "react";
 import MainP from "./mainp/mainp";
 import ErrorPage from "@modules/components/errorPage";
 import Layout from "@modules/components/layout";
+import AddPost from "./post/add.post";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 
@@ -31,6 +32,7 @@ const App: React.FC = () => {
                             </Suspense>
                         }
                     />
+                    <Route path="/post/new" element={<AddPost />} />
                     <Route path="*" element={
                         <Layout>
                             <ErrorPage>
