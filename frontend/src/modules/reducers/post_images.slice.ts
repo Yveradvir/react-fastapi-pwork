@@ -19,7 +19,7 @@ const initialState: PostImagesState = {
         second: "",
         third: "",
         fourth: "",
-        fifth: ""
+        fifth: "",
     },
     loadingStatus: LoadingStatus.NotLoaded,
     error: null,
@@ -29,12 +29,16 @@ const postImagesSlice = createSlice({
     name: POST_IMAGES_FEATURE_KEY,
     initialState,
     reducers: {
-        change: (state, action: PayloadAction<{ image: YvesFile; name: string }>) => {
+        change: (
+            state,
+            action: PayloadAction<{ image: YvesFile; name: string }>
+        ) => {
             const { image, name } = action.payload;
 
             if (image && state.images) {
                 if (typeof image !== "string") {
-                    const blob = image instanceof Blob ? image : new Blob([image]);
+                    const blob =
+                        image instanceof Blob ? image : new Blob([image]);
                     blobToBase64(blob).then((base64) => {
                         state.images[name] = base64;
                     });
@@ -43,11 +47,12 @@ const postImagesSlice = createSlice({
                 }
             }
         },
-        reset: (state, action: PayloadAction<{name: string}>) => {
+        reset: (state, action: PayloadAction<{ name: string }>) => {
             if (state.images) {
                 state.images[action.payload.name] = "";
             }
-        } 
+        },
+        globalReset: () => initialState
     },
 });
 

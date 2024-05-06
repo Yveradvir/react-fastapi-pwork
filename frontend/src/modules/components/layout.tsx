@@ -16,7 +16,7 @@ const Layout: React.FC<Props> = ({ children, needToFab=true }) => {
             <Container>
                 {children}
             </Container>
-            {needToFab && !cookies.get("refresh") && <YvesFab/>}
+            {needToFab && !!cookies.get("refresh_csrf") && <YvesFab/>}
         </div>
     );
 };

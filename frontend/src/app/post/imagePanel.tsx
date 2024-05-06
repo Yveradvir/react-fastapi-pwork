@@ -1,8 +1,9 @@
 import { Grid, Paper, Skeleton, Button, Typography } from "@mui/material";
 import { MuiFileInput } from "mui-file-input";
-import React from "react";
-import { useAppDispatch, useAppSelector } from "@modules/reducers";
+import React, { useState } from "react";
 import { postImagesActions } from "@modules/reducers/post_images.slice";
+import blobToBase64 from "@modules/utils/blob";
+import { useAppDispatch } from "@modules/reducers";
 
 interface ImagePanelProps {
     name: string;
@@ -10,34 +11,46 @@ interface ImagePanelProps {
 
 const ImagePanel: React.FC<ImagePanelProps> = ({ name }) => {
     const dispatch = useAppDispatch();
-    const { images, error } = useAppSelector((state) => state.post_images);
 
-    const handleFileChange = (image: File) =>
-        dispatch(
-            postImagesActions.change({
-                image,
-                name,
+    const [image, setImage] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
+
+    const handleFileChange = (file: File) => {
+        blobToBase64(new Blob([file]))
+            .then((b64) => {
+                setImage(b64);
+                setError(null);
+
+                dispatch(postImagesActions.change({ image: b64, name: name }));
             })
-        );
+            .catch((error) => {
+                setError(error)
+                console.error(error);
+            })
+    };
 
-    const handleRemoveImage = () => dispatch(postImagesActions.reset({ name }));
+    const handleRemoveImage = () => {
+        dispatch(postImagesActions.reset({ name }));
+        setImage("");
+        setError(null);
+    };
 
     return (
-        <Grid>
+        <Grid item>
             <Paper
                 elevation={3}
                 style={{ padding: "20px", textAlign: "center" }}
             >
                 {error ? (
                     <Typography variant="body1" color="error">
-                        {error.detail}
+                        {error}
                     </Typography>
                 ) : (
                     <>
-                        {images![name] ? (
+                        {image ? (
                             <>
                                 <img
-                                    src={images[name]}
+                                    src={image}
                                     alt={name}
                                     style={{
                                         maxWidth: "100%",
@@ -66,10 +79,11 @@ const ImagePanel: React.FC<ImagePanelProps> = ({ name }) => {
             <MuiFileInput
                 inputProps={{ accept: "image/png, image/gif, image/jpeg" }}
                 size="small"
-                onChange={(file) => {
-                    if (file instanceof File) handleFileChange(file)
-                    else handleRemoveImage()
-                }}
+                onChange={(file) =>
+                    file instanceof File
+                        ? handleFileChange(file)
+                        : handleRemoveImage()
+                }
             />
         </Grid>
     );

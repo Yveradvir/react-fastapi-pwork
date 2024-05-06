@@ -5,9 +5,15 @@ import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
 import SpinnerButton from "@modules/components/submitspinner";
 import { PostSchema, PostValues } from "@modules/validations/post.vd";
-
+import ImagePanel from "./imagePanel";
+import Carousel from "react-material-ui-carousel";
+import { useAppDispatch, useAppSelector } from "@modules/reducers";
+import { postImagesActions } from "@modules/reducers/post_images.slice";
 
 const AddPost: React.FC = () => {
+    const { images } = useAppSelector(state => state.post_images)
+    const dispatch = useAppDispatch();
+
     const [error, setError] = useState("");
     const initialValues: PostValues = {
         title: "",
@@ -20,16 +26,19 @@ const AddPost: React.FC = () => {
             fifth: undefined
         }
     };
-    // const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"] 
+    const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
     const onSubmitHandler = async (values: PostValues) => {
         try {
+            values.postImages = images!; 
             console.log(values);
             setError("");
         } catch (error) {
             setError("Something went wrong . . .");
         }
     };
+
+    React.useEffect(() => {dispatch(postImagesActions.globalReset())})
 
     return (
         <Layout needToFab={false}>
@@ -69,8 +78,12 @@ const AddPost: React.FC = () => {
                                         {(msg) => <Danger text={msg} />}
                                     </ErrorMessage>
                                 </Grid>
-                                <Grid>
-
+                                <Grid item xs={12}>
+                                    <Carousel>
+                                        {_postImagesKeys.map((key) => (
+                                            <ImagePanel name={key} key={key} />
+                                        ))}
+                                    </Carousel>
                                 </Grid>
                             </Grid>
                             <SpinnerButton
