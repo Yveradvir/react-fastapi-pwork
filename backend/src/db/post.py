@@ -20,8 +20,8 @@ class PostPropsTable(InitialMixin, db.base):
     rank = Column(String)
 
     # For social media
-    mainly_link = Column(String)
-    secondly_link = Column(String)
+    discord_tag = Column(String)
+    telegram_tag = Column(String)
 
 
 class PostImagesTable(InitialMixin, db.base):

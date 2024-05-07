@@ -47,12 +47,12 @@ const postImagesSlice = createSlice({
                 }
             }
         },
-        reset: (state, action: PayloadAction<{ name: string }>) => {
+        reset: (state, action: PayloadAction<{ name: string }>) => {            
             if (state.images) {
                 state.images[action.payload.name] = "";
             }
         },
-        globalReset: () => initialState
+        globalReset: () => initialState,
     },
 });
 

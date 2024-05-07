@@ -5,10 +5,11 @@ import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
 import SpinnerButton from "@modules/components/submitspinner";
 import { PostSchema, PostValues } from "@modules/validations/post.vd";
-import ImagePanel from "./imagePanel";
+import ImagePanel from "./components/imagePanel";
 import Carousel from "react-material-ui-carousel";
-import { useAppDispatch, useAppSelector } from "@modules/reducers";
+import { useAppDispatch, useAppSelector, store } from "@modules/reducers";
 import { postImagesActions } from "@modules/reducers/post_images.slice";
+import PropsPanel from "./components/propsPanel";
 
 const AddPost: React.FC = () => {
     const { images } = useAppSelector(state => state.post_images)
@@ -24,21 +25,26 @@ const AddPost: React.FC = () => {
             third: undefined,
             fourth: undefined,
             fifth: undefined
+        },
+        postProps: {
+            discord_tag: undefined,
+            telegram_tag: undefined,
+            rank: undefined
         }
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
     const onSubmitHandler = async (values: PostValues) => {
         try {
-            values.postImages = images!; 
-            console.log(values);
+            values.postImages = store.getState().post_images.images!; 
+            console.log(values, store.getState().post_images.images!);
             setError("");
         } catch (error) {
             setError("Something went wrong . . .");
         }
     };
 
-    React.useEffect(() => {dispatch(postImagesActions.globalReset())})
+    React.useEffect(() => {dispatch(postImagesActions.globalReset())}, [dispatch])
 
     return (
         <Layout needToFab={false}>
@@ -77,6 +83,9 @@ const AddPost: React.FC = () => {
                                     <ErrorMessage name="content">
                                         {(msg) => <Danger text={msg} />}
                                     </ErrorMessage>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <PropsPanel />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Carousel>
