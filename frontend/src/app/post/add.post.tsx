@@ -7,12 +7,15 @@ import SpinnerButton from "@modules/components/submitspinner";
 import { PostSchema, PostValues } from "@modules/validations/post.vd";
 import ImagePanel from "./components/imagePanel";
 import Carousel from "react-material-ui-carousel";
-import { useAppDispatch, useAppSelector, store } from "@modules/reducers";
+import { useAppDispatch, store, useAppSelector } from "@modules/reducers";
 import { postImagesActions } from "@modules/reducers/post_images.slice";
 import PropsPanel from "./components/propsPanel";
+import { useNavigate } from "react-router-dom";
+import { LoadingStatus } from "@modules/reducers/main";
 
 const AddPost: React.FC = () => {
-    const { images } = useAppSelector(state => state.post_images)
+    const navigate = useNavigate();
+    const { loadingStatus, profile } = useAppSelector(state => state.profile)
     const dispatch = useAppDispatch();
 
     const [error, setError] = useState("");
@@ -44,7 +47,24 @@ const AddPost: React.FC = () => {
         }
     };
 
-    React.useEffect(() => {dispatch(postImagesActions.globalReset())}, [dispatch])
+    React.useEffect(() => {
+        if (loadingStatus !== LoadingStatus.Loaded) navigate("/auth/signin")
+        let is_ignore = false;
+
+        if (!is_ignore) {
+            dispatch(postImagesActions.globalReset())
+
+            const _ = async () => {
+
+            }
+
+            _();
+        }
+        
+        return () => {
+            is_ignore = true;
+        }
+    }, [dispatch, profile, loadingStatus, navigate])
 
     return (
         <Layout needToFab={false}>

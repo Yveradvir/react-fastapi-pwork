@@ -12,7 +12,11 @@ class UserTable(InitialMixin, db.base):
 
     password = Column(Text, nullable=False)
     email = Column(String(120), nullable=False, unique=True)
-    
+
+    # ..._uh means "which user have"    
+    groups_uh = relationship("GroupTable", backref="users")
+    posts_uh = relationship("PostTable", backref="users")
+
     profile_image = relationship("ProfileImageTable", uselist=False, backref="users")
 
     def __init__(self, **kwargs) -> None:

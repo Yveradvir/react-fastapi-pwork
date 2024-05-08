@@ -54,7 +54,26 @@ export const getProfileImage = createAsyncThunk<string, string>(
                 });
             }
         } catch (error) {
+            return thunkAPI.rejectWithValue("Something went wrong")
+        }
+    }
+)
 
+export interface GroupsTitleId { title: string; uuid: string; }
+export const getGroups = createAsyncThunk<List<GroupsTitleId>, string>(
+    "profile/groups",
+    async (uid, thunkAPI) => {
+        try {
+            const response = await LaunchedAxios.get(`/profile/single/${uid}/groups`);
+    
+            if (response.data.ok) {
+                return response.data.subdata as GroupsNameUuid
+            } else {
+                return thunkAPI.rejectWithValue({
+                    status_code: 500
+                });
+            }
+        } catch (error) {
             return thunkAPI.rejectWithValue("Something went wrong")
         }
     }

@@ -2,29 +2,16 @@ from uuid import UUID
 from fastapi import Path
 
 from api_loader import *
+from backend.src.db.post import GroupTable
 from base_loader import *
 
+from src.db.utils import get_user_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
 from src.models.base_models import Subdated
 
 
 router = APIRouter(prefix="/profile")
 subrouter = APIRouter(prefix="/single")
-
-async def get_user_by_uuid(user_id: str, session: AsyncSession) -> UserTable:
-    try:
-        user_uuid = UUID(user_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid user ID. Must be a valid UUID."
-        )
-
-    user = (await session.execute(
-        select(UserTable).where(UserTable.id == user_uuid)
-    )).scalar_one_or_none()
-
-    return user
 
 @subrouter.get("/{user_id}", response_model=Subdated, status_code=status.HTTP_200_OK)
 async def get_profile(
@@ -77,6 +64,34 @@ async def get_profile_image(
             status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+
+@subrouter.get("/{user_id}/groups", response_model=Subdated, status_code=status.HTTP_200_OK)
+async def get_profile_groups(
+    user_id: str = Path(..., title="User ID"), 
+    session: AsyncSession = Depends(db.get_session)
+):
+    user = (await get_user_by_uuid(user_id, session))
+
+    if user:
+        groups = (await session.execute(
+            select(GroupTable).where(GroupTable.author_id == user.id)
+        )).all()
+
+        return JSONResponse(
+            Subdated(
+                subdata=[
+                    {"title": group.title, "uuid": str(group.id)} 
+                    for group in groups
+                ]
+            ).model_dump()
+        )
+    else:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+
 router.include_router(subrouter)
 
 @router.get("/my", status_code=status.HTTP_307_TEMPORARY_REDIRECT)

@@ -1,8 +1,22 @@
+from sqlalchemy import ForeignKeyConstraint
 from .sql_loader import *
 from . import db
 
+class GroupTable(InitialMixin, db.base):
+    __tablename__ = "groups"
+
+    title = Column(String(80), nullable=False)
+    content = Column(Text)
+
+    author_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
+
+    posts = relationship("PostTable", backref="groups")
+
 class PostTable(InitialMixin, db.base):
     __tablename__ = "posts"
+
+    group_id = Column(Uuid(as_uuid=True), ForeignKey('groups.id'))
+    author_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
 
     title = Column(String(80), nullable=False)
     content = Column(Text, nullable=False)
@@ -12,6 +26,14 @@ class PostTable(InitialMixin, db.base):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['group_id'], ['groups.id'], 
+            name='fk_group_id'
+        ),
+    )
+
 
 class PostPropsTable(InitialMixin, db.base):
     __tablename__ = "postprops"
