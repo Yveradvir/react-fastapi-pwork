@@ -4,6 +4,7 @@ import { LoadingStatus, ReduxRejfullTools, RejectedError } from "./main";
 
 export const PROFILE_FEATURE_KEY = "profile";
 
+export interface GroupsTitleId { title: string; uuid: string; }
 export interface ProfileEntity {
     id: string
     first_name: string
@@ -21,6 +22,7 @@ export interface CurrentProfileState {
     loadingStatus: LoadingStatus;
     profileImageStatus: LoadingStatus;
     error?: RejectedError | null;
+    groups?: GroupsTitleId[] | null;
 }
 
 export const getProfile = createAsyncThunk<ProfileEntity>(
@@ -59,15 +61,18 @@ export const getProfileImage = createAsyncThunk<string, string>(
     }
 )
 
-export interface GroupsTitleId { title: string; uuid: string; }
-export const getGroups = createAsyncThunk<List<GroupsTitleId>, string>(
+export const getProfileGroups = createAsyncThunk<GroupsTitleId[] | null, string>(
     "profile/groups",
     async (uid, thunkAPI) => {
         try {
             const response = await LaunchedAxios.get(`/profile/single/${uid}/groups`);
     
             if (response.data.ok) {
-                return response.data.subdata as GroupsNameUuid
+                const sdata = response.data.subdata;
+                return sdata.lenght !== 0 
+                    ? sdata as GroupsTitleId[]
+                    : null
+                 
             } else {
                 return thunkAPI.rejectWithValue({
                     status_code: 500
@@ -83,6 +88,7 @@ const profileSlice = createSlice({
     name: PROFILE_FEATURE_KEY,
     initialState: {
         profile: null,
+        groups: null,
         loadingStatus: LoadingStatus.NotLoaded,
         profileImageStatus: LoadingStatus.NotLoaded,
         error: null,
@@ -103,14 +109,14 @@ const profileSlice = createSlice({
                     state.loadingStatus = LoadingStatus.Loaded;
                 }
             )
-            .addCase(getProfileImage.pending, (state: CurrentProfileState) => {
-                state.profileImageStatus = LoadingStatus.Loading;
-            })
             .addCase(getProfile.rejected, (state: CurrentProfileState, action) => {
                 console.log(action);
                 
                 state.loadingStatus = LoadingStatus.Error;
                 state.error = action.payload as RejectedError;
+            })
+            .addCase(getProfileImage.pending, (state: CurrentProfileState) => {
+                state.profileImageStatus = LoadingStatus.Loading;
             })
             .addCase(
                 getProfileImage.fulfilled,
@@ -126,6 +132,20 @@ const profileSlice = createSlice({
             )
             .addCase(getProfileImage.rejected, (state: CurrentProfileState, action) => {
                 state.profileImageStatus = LoadingStatus.Error;
+                state.error = action.payload as RejectedError;
+            })
+            .addCase(
+                getProfileGroups.fulfilled,
+                (
+                    state: CurrentProfileState,
+                    action: PayloadAction<GroupsTitleId[] | null>
+                ) => {
+                    if (state.profile) {
+                        state.groups = action.payload;
+                    }
+                }
+            )
+            .addCase(getProfileGroups.rejected, (state: CurrentProfileState, action) => {
                 state.error = action.payload as RejectedError;
             });
     },

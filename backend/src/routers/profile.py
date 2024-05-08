@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import Path
 
 from api_loader import *
-from backend.src.db.post import GroupTable
+from src.db.post import GroupTable
 from base_loader import *
 
 from src.db.utils import get_user_by_uuid

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, TextField, Typography } from "@mui/material";
+import { Grid, TextField, Typography } from "@mui/material"; 
 import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
 import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
@@ -12,6 +12,7 @@ import { postImagesActions } from "@modules/reducers/post_images.slice";
 import PropsPanel from "./components/propsPanel";
 import { useNavigate } from "react-router-dom";
 import { LoadingStatus } from "@modules/reducers/main";
+import { getProfileGroups } from "@modules/reducers/profile.slice";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
@@ -52,13 +53,8 @@ const AddPost: React.FC = () => {
         let is_ignore = false;
 
         if (!is_ignore) {
-            dispatch(postImagesActions.globalReset())
-
-            const _ = async () => {
-
-            }
-
-            _();
+            dispatch(postImagesActions.globalReset());
+            dispatch(getProfileGroups(profile!.id));
         }
         
         return () => {
@@ -96,8 +92,9 @@ const AddPost: React.FC = () => {
                                     <Field
                                         name="content"
                                         type="text"
-                                        as={TextField}
+                                        as={TextField} 
                                         label="Content"
+                                        multiline
                                         fullWidth
                                     />
                                     <ErrorMessage name="content">
