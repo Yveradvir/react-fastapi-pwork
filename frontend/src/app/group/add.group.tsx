@@ -20,7 +20,7 @@ const AddGroup: React.FC = () => {
         try {
             const response = await LaunchedAxios.post("/group/new", values)
             if (response.data.ok) {
-                navigate("/club")
+                navigate(`/club/${response.data.subdata.result}`)
             }
             setError("");
         } catch (error) {
@@ -70,7 +70,7 @@ const AddGroup: React.FC = () => {
                             </Grid>
                             <SpinnerButton
                                 type="submit"
-                                text="Add Post"
+                                text="Add Group"
                                 isSubmitting={isSubmitting}
                             />
                             {error && <Danger text={error} />}

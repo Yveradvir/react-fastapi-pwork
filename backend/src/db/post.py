@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import ForeignKeyConstraint, Enum
 from .sql_loader import *
 from . import db
 
@@ -11,6 +11,16 @@ class GroupTable(InitialMixin, db.base):
     author_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
 
     posts = relationship("PostTable", backref="groups")
+
+class GroupUserMemberships(InitialMixin, db.base):
+    __tablename__ = "gumemberships"
+
+    group_id = Column(Uuid(as_uuid=True), ForeignKey('groups.id'))
+    user_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
+    access = Column(Integer, default=0)
+
+    group = relationship("GroupTable", backref="group_memberships")
+    user = relationship("UserTable", backref="group_memberships")
 
 class PostTable(InitialMixin, db.base):
     __tablename__ = "posts"

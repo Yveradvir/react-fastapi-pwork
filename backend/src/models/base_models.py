@@ -16,7 +16,7 @@ class BaseResponseModel(BaseModel):
     additionals: BaseAdditionalsModel = BaseAdditionalsModel()
 
 class Subdated(BaseResponseModel):
-    subdata: dict
+    subdata: dict | list
 
 __all__ = [
     "BaseAdditionalsModel", "BaseRequestModel", 

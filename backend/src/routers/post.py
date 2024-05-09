@@ -30,7 +30,7 @@ async def get_post(
                     "post_props": post.post_props.to_dict(),
                     "post_images": post.post_props.to_dict()
                 }
-            )
+            ).model_dump()
         )
     else:
         raise HTTPException(

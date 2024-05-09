@@ -29,6 +29,11 @@ async def get_scalar_by_uuid(
     
     return scalar
 
+class AccessEnum(Enum):
+    member = 0
+    admin = 1
+    owner = 2
+
 class FilterTypes(Enum):
     title = auto()
     new = auto()
