@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 from uuid import UUID, uuid4
 from typing import Type
 
@@ -26,3 +28,9 @@ async def get_scalar_by_uuid(
     )).scalar_one_or_none()
     
     return scalar
+
+class FilterTypes(Enum):
+    title = auto()
+    new = auto()
+    old = auto()
+    

@@ -20,3 +20,4 @@ jwtsecure = JwtSecure(JwtConfig(
     secret_key=_g("secret_key")
 ))
 password = CryptContext(schemes=["bcrypt"], deprecated="auto")
+PAGINATION_UNIT = 5
