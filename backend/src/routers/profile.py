@@ -5,7 +5,7 @@ from api_loader import *
 from src.db.post import GroupTable
 from base_loader import *
 
-from src.db.utils import get_user_by_uuid
+from src.db.utils import get_scalar_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
 from src.models.base_models import Subdated
 
@@ -18,7 +18,7 @@ async def get_profile(
     user_id: str = Path(..., title="User ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
-    user = (await get_user_by_uuid(user_id, session))
+    user = (await get_scalar_by_uuid(user_id, session))
 
     if user:
         user = user.to_dict()
@@ -40,7 +40,7 @@ async def get_profile_image(
     user_id: str = Path(..., title="User ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
-    user = (await get_user_by_uuid(user_id, session))
+    user = (await get_scalar_by_uuid(user_id, session))
 
     if user:
         image = (await session.execute(
@@ -70,7 +70,7 @@ async def get_profile_groups(
     user_id: str = Path(..., title="User ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
-    user = (await get_user_by_uuid(user_id, session))
+    user = (await get_scalar_by_uuid(user_id, session))
 
     if user:
         groups = (await session.execute(

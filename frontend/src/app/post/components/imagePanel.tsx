@@ -70,7 +70,7 @@ const ImagePanel: React.FC<ImagePanelProps> = ({ name }) => {
             <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
                 <MuiFileInput
                     inputProps={{
-                        accept: "image/png, image/gif, image/jpeg",
+                        accept: "image/jpeg",
                     }}
                     size="small"
                     id="file-input"

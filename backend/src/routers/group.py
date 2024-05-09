@@ -6,36 +6,32 @@ from base_loader import *
 
 from src.db.utils import get_scalar_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
-from src.db.post import PostTable, PostPropsTable, PostImagesTable
+from src.db.post import GroupTable
 
 from src.models.base_models import Subdated
 from src.models.group import GroupMakeRequest
 
 
-router = APIRouter(prefix="/post")
+router = APIRouter(prefix="/group")
 subrouter = APIRouter(prefix="/single")
 
-@subrouter.get("/{post_id}", status_code=status.HTTP_200_OK)
+@subrouter.get("/{group_id}", status_code=status.HTTP_200_OK)
 async def get_post(
-    post_id: str = Path(..., title="Post ID"), 
+    group_id: str = Path(..., title="Group ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
-    post: PostTable = (await get_scalar_by_uuid(post_id, session, PostTable))
+    group = (await get_scalar_by_uuid(group_id, session, GroupTable))
     
-    if post:
+    if group:
         return JSONResponse(
             Subdated(
-                subdata={
-                    **post.to_dict(), 
-                    "post_props": post.post_props.to_dict(),
-                    "post_images": post.post_props.to_dict()
-                }
+                subdata=group.to_dict()
             )
         )
     else:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
-            detail="Post is not found"
+            detail="Group is not found"
         )
 
 router.include_router(subrouter)
