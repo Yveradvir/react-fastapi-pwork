@@ -7,6 +7,11 @@ export enum LoadingStatus {
     Error = "error"
 }
 
+export interface InitialMixin {
+    created_at: string;
+    updated_at: string;
+}
+
 export interface RejectedError {
     status_code: number;
     detail: string;

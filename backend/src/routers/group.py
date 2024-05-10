@@ -97,3 +97,31 @@ async def new_post(
                 }
             ).model_dump()
         )
+    
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_groups(
+    f: str = Query(None, title="Filter value/s"), 
+    ft: str = Query(FilterTypes.new.name, title="Filter type"),
+    page: int = Query(1, title="Page"),
+    session: AsyncSession = Depends(db.get_session)
+):
+    offset = (page - 1) * PAGINATION_UNIT
+
+    base_query = select(UserTable)
+
+    if f:
+        if ft == FilterTypes.title.value:
+            base_query = base_query.where(PostTable.title.ilike(f))
+        elif ft == FilterTypes.new.value:
+            base_query = base_query.order_by(PostTable.created_at.desc())
+        elif ft == FilterTypes.old.value:
+            base_query = base_query.order_by(PostTable.created_at.asc())
+
+    paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
+
+    groups = await session.execute(paginated_query)
+    groups = groups.scalars().all()
+
+    groups_data = [group.to_dict() for group in groups]
+
+    return JSONResponse(Subdated(subdata=groups_data).model_dump())

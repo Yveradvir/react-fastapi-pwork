@@ -5,25 +5,25 @@ import {
     EntityState,
     PayloadAction,
 } from "@reduxjs/toolkit";
-import { LoadingStatus, RejectedError } from "./main";
+import { InitialMixin, LoadingStatus, RejectedError } from "./main";
 
 export const POSTS_FEATURE_KEY = "posts";
 
-export interface PostsEntity {
+export interface PostEntity extends InitialMixin {
     id: string;
 }
 
-export interface PostsState extends EntityState<PostsEntity, string> {
+export interface PostsState extends EntityState<PostEntity, string> {
     loadingStatus: LoadingStatus;
     error?: RejectedError | null;
 }
 
-export const postsAdapter = createEntityAdapter<PostsEntity>();
-export const fetchPosts = createAsyncThunk<PostsEntity[]>(
+export const postsAdapter = createEntityAdapter<PostEntity>();
+export const fetchPosts = createAsyncThunk<PostEntity[]>(
     "posts/fetchStatus",
     async (_, thunkAPI) => {
         try {
-            const data: PostsEntity[] = [];
+            const data: PostEntity[] = [];
             
             return data;
         } catch (error) {
@@ -51,7 +51,7 @@ export const postsSlice = createSlice({
             })
             .addCase(
                 fetchPosts.fulfilled,
-                (state: PostsState, action: PayloadAction<PostsEntity[]>) => {
+                (state: PostsState, action: PayloadAction<PostEntity[]>) => {
                     postsAdapter.setAll(state, action.payload);
                     state.loadingStatus = LoadingStatus.Loaded;
                 }
