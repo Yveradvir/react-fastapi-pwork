@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const actions = [
     { icon: <PostAdd />, name: "Add new post", url: "/post/new"},
     { icon: <GroupAdd />, name: "Add new group", url: "/group/new" },
-    { icon: <Group />, name: "My groups" },
+    { icon: <Group />, name: "My groups", url: "/group/my"},
 ];
 
 const YvesFab: React.FC = () => {

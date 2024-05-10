@@ -12,6 +12,7 @@ import ErrorPage from "@modules/components/errorPage";
 import Layout from "@modules/components/layout";
 import AddPost from "./post/add.post";
 import AddGroup from "./group/add.group";
+import MyGroups from "./group/my.group";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 
@@ -35,6 +36,7 @@ const App: React.FC = () => {
                     />
                     <Route path="/post/new" element={<AddPost />} />
                     <Route path="/group/new" element={<AddGroup />} />
+                    <Route path="/group/my" element={<MyGroups />} />
                     <Route path="*" element={
                         <Layout>
                             <ErrorPage>
