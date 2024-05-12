@@ -6,15 +6,14 @@ import {
     PayloadAction,
 } from "@reduxjs/toolkit";
 import { InitialMixin, LoadingStatus, RejectedError } from "./main";
+import { v4 as uuidv4 } from 'uuid';
 
 export const GROUPS_FEATURE_KEY = "groups";
 
 export interface GroupEntity extends InitialMixin {
     id: string;
-    
     title: string;
     content: string;
-
     author_id: string;
 }
 
@@ -28,11 +27,18 @@ export const fetchGroups = createAsyncThunk<GroupEntity[]>(
     "groups/fetchStatus",
     async (_, thunkAPI) => {
         try {
-            const data: GroupEntity[] = [];
-            
-            return data;
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            const fakeData: GroupEntity[] = Array.from({ length: 5 }, () => ({
+                id: uuidv4(),
+                title: `Post ${uuidv4()}`,
+                content: `This is the content of post.`,
+                author_id: uuidv4(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString() 
+            }));
+            return fakeData;
         } catch (error) {
-            return thunkAPI.rejectWithValue("Something went wrong")
+            return thunkAPI.rejectWithValue("Something went wrong");
         }
     }
 );
@@ -72,5 +78,4 @@ export const groupsReducer = groupsSlice.reducer;
 export const groupsActions = groupsSlice.actions;
 
 const { selectAll } = groupsAdapter.getSelectors();
-
 export const selectAllGroups = selectAll;
