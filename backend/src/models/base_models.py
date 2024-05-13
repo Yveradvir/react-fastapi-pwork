@@ -1,4 +1,6 @@
-from base_loader import Dict, Union
+from fastapi import Query
+from src.db.utils import FilterTypes
+from base_loader import Optional, Union
 from pydantic import BaseModel
 
 class BaseAdditionalsModel(BaseModel):
@@ -18,7 +20,13 @@ class BaseResponseModel(BaseModel):
 class Subdated(BaseResponseModel):
     subdata: dict | list
 
+class Paged(BaseModel):
+    f: Optional[str] = Query(None, title="Filter value/s")
+    ft: str = Query(FilterTypes.new.name, title="Filter type")
+    page: int = Query(1, title="Page")
+    isMine: bool = Query(False)
+
 __all__ = [
     "BaseAdditionalsModel", "BaseRequestModel", 
-    "BaseResponseModel", "BaseModel", "Subdated"
+    "BaseResponseModel", "BaseModel", "Subdated", "Paged"
 ]

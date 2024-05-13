@@ -6,7 +6,7 @@ import {
     PayloadAction,
 } from "@reduxjs/toolkit";
 import { InitialMixin, LoadingStatus, RejectedError } from "./main";
-import { v4 as uuidv4 } from 'uuid';
+import { LaunchedAxios } from "@modules/api/api";
 
 export const GROUPS_FEATURE_KEY = "groups";
 
@@ -23,20 +23,16 @@ export interface GroupsState extends EntityState<GroupEntity, string> {
 }
 
 export const groupsAdapter = createEntityAdapter<GroupEntity>();
-export const fetchGroups = createAsyncThunk<GroupEntity[]>(
+export const fetchGroups = createAsyncThunk<GroupEntity[], {isMine: boolean, page: number}>(
     "groups/fetchStatus",
-    async (_, thunkAPI) => {
+    async ({isMine, page}, thunkAPI) => {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            const fakeData: GroupEntity[] = Array.from({ length: 5 }, () => ({
-                id: uuidv4(),
-                title: `Post ${uuidv4()}`,
-                content: `This is the content of post.`,
-                author_id: uuidv4(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString() 
-            }));
-            return fakeData;
+            return await LaunchedAxios.get("/group/", {
+                params: {
+                    ...thunkAPI.getState().filter.filter,
+                    page, isMine
+                }
+            });
         } catch (error) {
             return thunkAPI.rejectWithValue("Something went wrong");
         }

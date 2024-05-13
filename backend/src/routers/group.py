@@ -1,15 +1,14 @@
-from enum import member
-from uuid import UUID
 from fastapi import Path, Query
+from sqlalchemy import Select
 
 from api_loader import *
 from base_loader import *
 
-from src.db.utils import AccessEnum, FilterTypes, get_scalar_by_uuid
+from src.db.utils import AccessEnum, FilterTypes, filtrating, get_scalar_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
-from src.db.post import GroupTable, GroupUserMemberships, PostTable
+from src.db.post import GroupTable, GroupUserMemberships
 
-from src.models.base_models import Subdated
+from src.models.base_models import Paged, Subdated
 from src.models.group import GroupMakeRequest
 
 
@@ -45,15 +44,15 @@ async def get_group_posts(
 ):
     offset = (page - 1) * PAGINATION_UNIT
 
-    base_query = select(PostTable).where(PostTable.group_id == group_id)
+    base_query = select(GroupTable).where(GroupTable.group_id == group_id)
 
     if f:
         if ft == FilterTypes.title.value:
-            base_query = base_query.where(PostTable.title.ilike(f))
+            base_query = base_query.where(GroupTable.title.ilike(f))
         elif ft == FilterTypes.new.value:
-            base_query = base_query.order_by(PostTable.created_at.desc())
+            base_query = base_query.order_by(GroupTable.created_at.desc())
         elif ft == FilterTypes.old.value:
-            base_query = base_query.order_by(PostTable.created_at.asc())
+            base_query = base_query.order_by(GroupTable.created_at.asc())
 
     paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
 
@@ -100,22 +99,30 @@ async def new_post(
     
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_groups(
-    f: str = Query(None, title="Filter value/s"), 
-    ft: str = Query(FilterTypes.new.name, title="Filter type"),
-    page: int = Query(1, title="Page"),
-    session: AsyncSession = Depends(db.get_session)
+    request: Request,
+    session: AsyncSession = Depends(db.get_session),
+    paged: Paged = Depends()
 ):
-    offset = (page - 1) * PAGINATION_UNIT
+    if paged.isMine:
+        access = jwtsecure.access_required(request)
 
-    base_query = select(UserTable)
+    offset = (paged.page - 1) * PAGINATION_UNIT
 
-    if f:
-        if ft == FilterTypes.title.value:
-            base_query = base_query.where(PostTable.title.ilike(f))
-        elif ft == FilterTypes.new.value:
-            base_query = base_query.order_by(PostTable.created_at.desc())
-        elif ft == FilterTypes.old.value:
-            base_query = base_query.order_by(PostTable.created_at.asc())
+    base_query = select(GroupTable)
+    if paged.isMine:
+        memberships_query = select(GroupUserMemberships).where(
+            GroupUserMemberships.user_id == access["payload"]["id"]
+        )
+        memberships = await session.execute(memberships_query)
+        memberships = memberships.scalars().all()
+
+        user_group_ids = {membership.group_id for membership in memberships}
+
+        base_query = base_query.where(GroupTable.id.in_(user_group_ids))
+
+    base_query: Select[Tuple[GroupTable]] = await filtrating(
+        paged.f, paged.ft, base_query, GroupTable
+    )
 
     paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
 

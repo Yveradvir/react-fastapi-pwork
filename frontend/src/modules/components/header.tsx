@@ -14,7 +14,7 @@ const Header: React.FC = () => {
 
     const navs: NavItem[] = [
         { to: "/home", text: "Home" },
-        { to: "/groups", text: "Groups" },
+        { to: "/group", text: "Groups" },
         { to: "/pricing", text: "Pricing" },
         { to: "/faqs", text: "FAQs" },
         { to: "/about", text: "About" },
