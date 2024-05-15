@@ -10,7 +10,7 @@ const validationSchema = Yup.object().shape({
     f: Yup.string().max(120, "Maximum 120 letters").optional(),
 });
 
-const FilterForm: React.FC = () => {
+const FilterForm: React.FC<{onAccept: () => void}> = ({ onAccept }) => {
     const dispatch = useAppDispatch();
     const initialValues: FilterEntity = {
         ft: FilterTypes.new,
@@ -25,10 +25,10 @@ const FilterForm: React.FC = () => {
         <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values) => {
                 console.log(values);
-                dispatch(filterActions.change(values))
-                setSubmitting(false);
+                dispatch(filterActions.change(values));
+                onAccept();
             }}
         >
             {({ values, handleChange }) => (

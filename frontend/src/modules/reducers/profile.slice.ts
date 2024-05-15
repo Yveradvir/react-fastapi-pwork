@@ -51,12 +51,10 @@ export const getProfileImage = createAsyncThunk<string, string>(
             if (response.data.ok) {
                 return response.data.subdata.result as string 
             } else {
-                return thunkAPI.rejectWithValue({
-                    status_code: 500
-                });
+                return thunkAPI.rejectWithValue(ReduxRejfullTools.standartReject());
             }
         } catch (error) {
-            return thunkAPI.rejectWithValue("Something went wrong")
+            return thunkAPI.rejectWithValue(ReduxRejfullTools.standartAxiosReject(error))
         }
     }
 )
@@ -74,12 +72,10 @@ export const getProfileGroups = createAsyncThunk<GroupsTitleId[] | null, string>
                     : null
                  
             } else {
-                return thunkAPI.rejectWithValue({
-                    status_code: 500
-                });
+                return thunkAPI.rejectWithValue(ReduxRejfullTools.standartReject());
             }
         } catch (error) {
-            return thunkAPI.rejectWithValue("Something went wrong")
+            return thunkAPI.rejectWithValue(ReduxRejfullTools.standartAxiosReject(error))
         }
     }
 )

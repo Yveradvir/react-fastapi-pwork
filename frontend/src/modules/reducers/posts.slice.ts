@@ -2,10 +2,11 @@ import {
     createAsyncThunk,
     createEntityAdapter,
     createSlice,
+    EntityId,
     EntityState,
     PayloadAction,
 } from "@reduxjs/toolkit";
-import { InitialMixin, LoadingStatus, RejectedError } from "./main";
+import { InitialMixin, LoadingStatus, ReduxRejfullTools, RejectedError } from "./main";
 
 export const POSTS_FEATURE_KEY = "posts";
 
@@ -13,12 +14,16 @@ export interface PostEntity extends InitialMixin {
     id: string;
 }
 
-export interface PostsState extends EntityState<PostEntity, string> {
+export interface PostsState extends EntityState<PostEntity, EntityId> {
     loadingStatus: LoadingStatus;
     error?: RejectedError | null;
+    ids: EntityId[];
 }
 
-export const postsAdapter = createEntityAdapter<PostEntity>();
+export const postsAdapter = createEntityAdapter<PostEntity>({
+    selectId: (group: PostEntity) => group.id,
+});
+
 export const fetchPosts = createAsyncThunk<PostEntity[]>(
     "posts/fetchStatus",
     async (_, thunkAPI) => {
@@ -27,7 +32,7 @@ export const fetchPosts = createAsyncThunk<PostEntity[]>(
             
             return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue("Something went wrong")
+            return thunkAPI.rejectWithValue(ReduxRejfullTools.standartAxiosReject(error))
         }
     }
 );
@@ -58,7 +63,7 @@ export const postsSlice = createSlice({
             )
             .addCase(fetchPosts.rejected, (state: PostsState, action) => {
                 state.loadingStatus = LoadingStatus.Error;
-                state.error = action.error as RejectedError;
+                state.error = action.payload as RejectedError;
             });
     },
 });

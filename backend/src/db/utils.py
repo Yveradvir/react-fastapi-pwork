@@ -40,12 +40,13 @@ class FilterTypes(Enum):
     old = auto()
 
 async def filtrating(f, ft, base_query, table):
-    if ft == FilterTypes.title:
-        if f:
+    print(f, ft)
+    if ft == FilterTypes.title.name:
+        if f.strip():
             base_query = base_query.where(table.title.ilike(f))
-    elif ft == FilterTypes.new:
+    elif ft == FilterTypes.new.name:
         base_query = base_query.order_by(table.created_at.desc())
-    elif ft == FilterTypes.old:
+    elif ft == FilterTypes.old.name:
         base_query = base_query.order_by(table.created_at.asc())
 
     return base_query

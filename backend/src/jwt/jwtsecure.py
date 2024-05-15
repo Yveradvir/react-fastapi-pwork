@@ -172,9 +172,10 @@ class JwtSecure:
         Returns:
             None
         """
-        data = self.verify(token).get("data", None)
+        data = self.verify(token)
 
-        if data:
+        if data.get("data", None):
+            data = data.get("data", None)
             self._set_cookie(
                 response, self.config.access_cookie_name, 
                 token, self.config.access_max_age
@@ -186,7 +187,7 @@ class JwtSecure:
             )
         else:
             response.headers["Content-Type"] = "application/json"
-            response.status_code = data["code"]
+            response.status_code = data["error"]
             response.body = json.dumps({
                 "error": data["error"]
             })
@@ -270,6 +271,15 @@ class JwtSecure:
                 )
                 
                 if cookie_csrf == header_csrf == payload_csrf:
+                    if ttype == "access":
+                        if token_decoded["triggered"]:
+                            self.set_access_cookie(
+                                Response(), 
+                                self.create_access_token({
+                                    "id": token_decoded["payload"]["id"]
+                                })
+                            )
+                            print("[TRIGGER > new token")
                     return token_decoded
                 else:
                     raise HTTPException(

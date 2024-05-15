@@ -6,7 +6,7 @@ from base_loader import *
 
 from src.db.utils import AccessEnum, FilterTypes, filtrating, get_scalar_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
-from src.db.post import GroupTable, GroupUserMemberships
+from src.db.post import GroupTable, GroupUserMemberships, PostTable
 
 from src.models.base_models import Paged, Subdated
 from src.models.group import GroupMakeRequest
@@ -37,22 +37,20 @@ async def get_group(
 @subrouter.get("/{group_id}/posts", status_code=status.HTTP_200_OK)
 async def get_group_posts(
     group_id: str = Path(..., title="Group ID"), 
-    f: str = Query(None, title="Filter value/s"), 
-    ft: str = Query(FilterTypes.new.name, title="Filter type"),
-    page: int = Query(1, title="Page"),
+    paged: Paged = Depends(),
     session: AsyncSession = Depends(db.get_session)
 ):
-    offset = (page - 1) * PAGINATION_UNIT
+    if paged.isMine:
+        access = jwtsecure.access_required()
+    offset = (paged.page - 1) * PAGINATION_UNIT
 
-    base_query = select(GroupTable).where(GroupTable.group_id == group_id)
+    base_query = select(PostTable).where(PostTable.group_id == group_id)
+    if paged.isMine: 
+        base_query = base_query.where(PostTable.id == access["payload"]["id"])
+    base_query: Select[Tuple[GroupTable]] = await filtrating(
+        paged.f, paged.ft, base_query, GroupTable
+    )
 
-    if f:
-        if ft == FilterTypes.title.value:
-            base_query = base_query.where(GroupTable.title.ilike(f))
-        elif ft == FilterTypes.new.value:
-            base_query = base_query.order_by(GroupTable.created_at.desc())
-        elif ft == FilterTypes.old.value:
-            base_query = base_query.order_by(GroupTable.created_at.asc())
 
     paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
 
@@ -132,3 +130,10 @@ async def get_groups(
     groups_data = [group.to_dict() for group in groups]
 
     return JSONResponse(Subdated(subdata=groups_data).model_dump())
+
+@router.get("/count", status_code=status.HTTP_200_OK)
+async def get_count(
+    session: AsyncSession = Depends(db.get_session)
+):
+    result = len((await session.execute(select(GroupTable))).scalars().all())
+    return JSONResponse(Subdated(subdata={"result": result}).model_dump())
