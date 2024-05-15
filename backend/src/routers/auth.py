@@ -34,7 +34,7 @@ async def signup(
 
             uid = str(new_user.id)
             
-            if body.profile_image is not None:
+            if body.profile_image:
                 await ProfileImageTable.add_new(b64=body.profile_image, uid=uid)
 
             access, access_csrf = jwtsecure.create_access_token(data={"id": uid})

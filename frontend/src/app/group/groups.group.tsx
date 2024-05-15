@@ -4,6 +4,7 @@ import {
     Accordion,
     AccordionSummary,
     Typography,
+    Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FilterForm from "@modules/components/filterForm";
@@ -12,8 +13,11 @@ import { useAppDispatch, useAppSelector } from "@modules/reducers";
 import { LoadingStatus } from "@modules/reducers/main";
 import { fetchCount, fetchGroups, GroupEntity } from "@modules/reducers/groups.slice";
 import ErrorPage from "@modules/components/errorPage";
+import { DoorBack } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const Groups: React.FC<{ isMine: boolean }> = ({ isMine }) => {
+    const navigate = useNavigate();
     const [page, setPage] = useState<number>(1);
     const dispatch = useAppDispatch();
     const groups = useAppSelector((state) => state.groups);
@@ -59,6 +63,14 @@ const Groups: React.FC<{ isMine: boolean }> = ({ isMine }) => {
                                                 <Typography>
                                                     {group.content}
                                                 </Typography>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => {navigate(`/group/${group.id}`)}}
+                                                >
+                                                    <DoorBack />
+                                                    Go
+                                                </Button>
                                             </div>
                                         </Accordion>
                                     )

@@ -15,6 +15,7 @@ import { store } from "@modules/reducers";
 const LazyHome = lazy(() => import("./mainp/home"));
 const LazyMyGroups = lazy(() => import("./group/my.group"));
 const LazyAllGroups = lazy(() => import("./group/all.group"));
+const LazySingleGroup = lazy(() => import("./group/single.group"));
 
 dayjs.extend(utc);
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
           <Route path="/group/new" element={<AddGroup />} />
           <Route path="/group/my" element={<LazyElement Lazy={LazyMyGroups} />} />
           <Route path="/group/" element={<LazyElement Lazy={LazyAllGroups} />} />
+          <Route path="/group/:group_id" element={<LazyElement Lazy={LazySingleGroup} />} />
           <Route path="*" element={
             <Layout>
               <ErrorPage>

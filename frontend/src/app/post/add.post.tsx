@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, TextField, Typography } from "@mui/material"; 
+import { Box, Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
 import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
@@ -16,7 +16,9 @@ import { getProfileGroups } from "@modules/reducers/profile.slice";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
-    const { loadingStatus, profile } = useAppSelector(state => state.profile)
+    const { loadingStatus, profile, groups } = useAppSelector(
+        (state) => state.profile
+    );
     const dispatch = useAppDispatch();
 
     const [error, setError] = useState("");
@@ -28,19 +30,19 @@ const AddPost: React.FC = () => {
             second: undefined,
             third: undefined,
             fourth: undefined,
-            fifth: undefined
+            fifth: undefined,
         },
         postProps: {
             discord_tag: undefined,
             telegram_tag: undefined,
-            rank: undefined
-        }
+            rank: undefined,
+        },
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
     const onSubmitHandler = async (values: PostValues) => {
         try {
-            values.postImages = store.getState().post_images.images!; 
+            values.postImages = store.getState().post_images.images!;
             console.log(values, store.getState().post_images.images!);
             setError("");
         } catch (error) {
@@ -49,18 +51,18 @@ const AddPost: React.FC = () => {
     };
 
     React.useEffect(() => {
-        if (loadingStatus !== LoadingStatus.Loaded) navigate("/auth/signin")
+        if (loadingStatus !== LoadingStatus.Loaded) navigate("/auth/signin");
         let is_ignore = false;
 
         if (!is_ignore) {
             dispatch(postImagesActions.globalReset());
             dispatch(getProfileGroups(profile!.id));
         }
-        
+
         return () => {
             is_ignore = true;
-        }
-    }, [dispatch, profile, loadingStatus, navigate])
+        };
+    }, [dispatch, profile, loadingStatus, navigate]);
 
     return (
         <Layout needToFab={false}>
@@ -92,7 +94,7 @@ const AddPost: React.FC = () => {
                                     <Field
                                         name="content"
                                         type="text"
-                                        as={TextField} 
+                                        as={TextField}
                                         label="Content"
                                         multiline
                                         fullWidth
@@ -103,6 +105,45 @@ const AddPost: React.FC = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <PropsPanel />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Grid item xs={12}>
+                                        {!groups! ? (
+                                            <Select>
+                                                {groups!.map((key) => (
+                                                    <MenuItem
+                                                        key={key.uuid}
+                                                        title={key.title}
+                                                        value={key.uuid}
+                                                    />
+                                                ))}
+                                            </Select>
+                                        ) : (
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                            >
+                                                <Typography
+                                                    variant="body1"
+                                                    color="textSecondary"
+                                                    style={{
+                                                        marginRight: "8px",
+                                                    }}
+                                                >
+                                                    You don't have any groups
+                                                    yet! Let's find you a new
+                                                    one:
+                                                </Typography>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => {navigate("/group/")}}
+                                                >
+                                                    Find Group
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </Grid>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Carousel>
