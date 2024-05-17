@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
 import Danger from "@modules/components/danger";
@@ -7,12 +7,12 @@ import SpinnerButton from "@modules/components/submitspinner";
 import { PostSchema, PostValues } from "@modules/validations/post.vd";
 import ImagePanel from "./components/imagePanel";
 import Carousel from "react-material-ui-carousel";
-import { useAppDispatch, store, useAppSelector } from "@modules/reducers";
-import { postImagesActions } from "@modules/reducers/post_images.slice";
-import PropsPanel from "./components/propsPanel";
 import { useNavigate } from "react-router-dom";
-import { LoadingStatus } from "@modules/reducers/main";
+import { store, useAppDispatch, useAppSelector } from "@modules/reducers";
+import { postImagesActions } from "@modules/reducers/post_images.slice";
 import { getProfileGroups } from "@modules/reducers/profile.slice";
+import { LoadingStatus } from "@modules/reducers/main";
+import PropsPanel from "./components/propsPanel";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
@@ -37,6 +37,7 @@ const AddPost: React.FC = () => {
             telegram_tag: undefined,
             rank: undefined,
         },
+        group_id: ""
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
@@ -50,13 +51,15 @@ const AddPost: React.FC = () => {
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (loadingStatus !== LoadingStatus.Loaded) navigate("/auth/signin");
         let is_ignore = false;
 
         if (!is_ignore) {
             dispatch(postImagesActions.globalReset());
             dispatch(getProfileGroups(profile!.id));
+            console.log(store.getState().profile.groups);
+            
         }
 
         return () => {
@@ -108,14 +111,19 @@ const AddPost: React.FC = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid item xs={12}>
-                                        {!groups! ? (
+                                        {groups ? (
                                             <Select>
-                                                {groups!.map((key) => (
+                                                <MenuItem
+                                                    value={"Select any of group"}
+                                                    selected
+                                                >Select any of group</MenuItem>
+                                                {groups.map((key) => (
                                                     <MenuItem
                                                         key={key.uuid}
-                                                        title={key.title}
-                                                        value={key.uuid}
-                                                    />
+                                                        value={key.uuid as string}
+                                                    >
+                                                        {key.title}
+                                                    </MenuItem>
                                                 ))}
                                             </Select>
                                         ) : (
@@ -137,7 +145,7 @@ const AddPost: React.FC = () => {
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
-                                                    onClick={() => {navigate("/group/")}}
+                                                    onClick={() => navigate("/group/")}
                                                 >
                                                     Find Group
                                                 </Button>

@@ -15,7 +15,7 @@ export const LaunchedAxios = axios.create({
 LaunchedAxios.interceptors.request.use(
     request => {
         if (import.meta.env.DEV) console.log("[ LaunchedAxios:request::use#fulfilled > ", request);
-
+        
         const csrf = cookies.get("access_csrf")
         if (csrf) request.headers["X-CSRF-Token"] = csrf
 

@@ -75,7 +75,7 @@ async def get_profile_groups(
     if user:
         groups = (await session.execute(
             select(GroupTable).where(GroupTable.author_id == user.id)
-        )).all()
+        )).scalars().all()
 
         return JSONResponse(
             Subdated(

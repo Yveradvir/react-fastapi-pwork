@@ -18,6 +18,7 @@ export interface PostProps {
 export interface PostValues {
     title: string;
     content: string;
+    group_id: string;
     postProps: PostProps;
     postImages: PostImages;
 }
@@ -30,6 +31,9 @@ export const PostSchema = Yup.object().shape({
     content: Yup.string()
         .min(2, "Minimum 2 letters")
         .max(12000, "Maximum 12000 letters")
+        .required("Field is required"),
+    group_id: Yup.string()
+        .uuid("You are not selected the group")
         .required("Field is required"),
     postProps: Yup.object().shape({
         rank: Yup.string()

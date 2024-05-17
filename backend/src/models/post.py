@@ -18,6 +18,7 @@ class PostMakeRequest(BaseRequestModel):
 
     title: str
     content: str
-    
+    group_id: str
+
     post_images: PostImages
     post_props: PostProsp

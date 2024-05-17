@@ -68,7 +68,7 @@ class PostImagesTable(InitialMixin, db.base):
     fourth = Column(LargeBinary, nullable=True)
     fifth = Column(LargeBinary, nullable=True)
 
-    async def get_main(self):
+    def get_main(self):
         return b64encode(
             self.main
         ).decode()

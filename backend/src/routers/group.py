@@ -17,15 +17,30 @@ subrouter = APIRouter(prefix="/single")
 
 @subrouter.get("/{group_id}", status_code=status.HTTP_200_OK)
 async def get_group(
+    request: Request,
     group_id: str = Path(..., title="Group ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
+    access = jwtsecure.access_required(request)
     group = (await get_scalar_by_uuid(group_id, session, GroupTable))
-    
+    memberships = (await session.execute(
+        select(GroupUserMemberships).where(
+            GroupUserMemberships.user_id == access["payload"]["id"]
+        ).where(
+            GroupUserMemberships.group_id == group.id
+        )
+    )).scalar_one_or_none()
+
     if group:
         return JSONResponse(
             Subdated(
-                subdata=group.to_dict()
+                subdata={
+                        "group": group.to_dict(),
+                        "relation": {
+                            "memberships": memberships.to_dict(),
+                            "totalCount": len((await session.execute(select(PostTable).where(PostTable.group_id == group_id))).scalars().all())
+                        }
+                    }
             ).model_dump()
         )
     else:
@@ -47,8 +62,8 @@ async def get_group_posts(
     base_query = select(PostTable).where(PostTable.group_id == group_id)
     if paged.isMine: 
         base_query = base_query.where(PostTable.id == access["payload"]["id"])
-    base_query: Select[Tuple[GroupTable]] = await filtrating(
-        paged.f, paged.ft, base_query, GroupTable
+    base_query: Select[Tuple[PostTable]] = await filtrating(
+        paged.f, paged.ft, base_query, PostTable
     )
 
 
@@ -57,9 +72,9 @@ async def get_group_posts(
     posts = await session.execute(paginated_query)
     posts = posts.scalars().all()
 
-    posts_data = [post.to_dict() for post in posts]
+    posts_data = [{**post.to_dict(), **post.post_props.to_dict(), "main":post.post_images.get_main()} for post in posts]
 
-    return JSONResponse(Subdated(subdata=posts_data).model_dump())
+    return JSONResponse(Subdated(subdata=posts_data.model_dump()))
 
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)

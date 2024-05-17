@@ -6,12 +6,29 @@ import {
     EntityState,
     PayloadAction,
 } from "@reduxjs/toolkit";
-import { InitialMixin, LoadingStatus, ReduxRejfullTools, RejectedError } from "./main";
+import {
+    InitialMixin,
+    LoadingStatus,
+    ReduxRejfullTools,
+    RejectedError,
+} from "./main";
+import { store } from ".";
+import { LaunchedAxios } from "@modules/api/api";
+import { PostProps } from "@modules/validations/post.vd";
 
 export const POSTS_FEATURE_KEY = "posts";
 
 export interface PostEntity extends InitialMixin {
-    id: string;
+    id: EntityId;
+
+    author_id: string;
+    group_id: string;
+
+    title: string;
+    content: string;
+
+    main: string | null;
+    post_props: PostProps;
 }
 
 export interface PostsState extends EntityState<PostEntity, EntityId> {
@@ -20,19 +37,23 @@ export interface PostsState extends EntityState<PostEntity, EntityId> {
     ids: EntityId[];
 }
 
-export const postsAdapter = createEntityAdapter<PostEntity>({
-    selectId: (group: PostEntity) => group.id,
-});
-
-export const fetchPosts = createAsyncThunk<PostEntity[]>(
+export const postsAdapter = createEntityAdapter<PostEntity>();
+export const fetchPosts = createAsyncThunk<PostEntity[], number>(
     "posts/fetchStatus",
-    async (_, thunkAPI) => {
+    async (page, thunkAPI) => {
         try {
-            const data: PostEntity[] = [];
-            
-            return data;
+            const filter = store.getState().filter.filter;
+            const response = await LaunchedAxios.get("/group/", {
+                params: {
+                    ...filter,
+                    page,
+                },
+            });
+            return response.data.subdata;
         } catch (error) {
-            return thunkAPI.rejectWithValue(ReduxRejfullTools.standartAxiosReject(error))
+            return thunkAPI.rejectWithValue(
+                ReduxRejfullTools.standartAxiosReject(error)
+            );
         }
     }
 );
