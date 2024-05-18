@@ -1,7 +1,7 @@
 from typing import Optional
 from .base_models import *
 
-class PostProsp(BaseModel):
+class PostProps(BaseModel):
     rank: Optional[str] = None
     discord_tag: Optional[str] = None
     telegram_tag: Optional[str] = None
@@ -17,5 +17,5 @@ class PostMakeRequest(BaseModel):
     title: str
     content: str
     group_id: str
-    post_images: PostImages
-    post_props: PostProsp
+    postImages: PostImages
+    postProps: PostProps

@@ -17,9 +17,7 @@ import { LaunchedAxios } from "@modules/api/api";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
-    const { loadingStatus, profile, groups } = useAppSelector(
-        (state) => state.profile
-    );
+    const { loadingStatus, profile, groups } = useAppSelector(state => state.profile);
     const dispatch = useAppDispatch();
 
     const [error, setError] = useState("");
@@ -42,24 +40,24 @@ const AddPost: React.FC = () => {
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
-    const onSubmitHandler = (values: PostValues, action: FormikHelpers<PostValues>) => {
-        const _ = async () => {
+    const onSubmitHandler = (values: PostValues, actions: FormikHelpers<PostValues>) => {
+        const submitForm = async () => {
             try {
                 values.postImages = { ...store.getState().post_images.images };
-                console.log(values, store.getState().post_images.images);
-                const response = await LaunchedAxios.post("/post/new", values)
-
+                console.log(values)
+                const response = await LaunchedAxios.post("/post/new", values);
+                
                 if (response.data.ok) {
-                    const sdata = response.data.subdata
-                    navigate(`/post/${sdata.group_id}/${sdata.post_id}`)
+                    const sdata = response.data.subdata;
+                    navigate(`/post/${sdata.group_id}/${sdata.post_id}`);
                 }
             } catch (error) {
                 setError("Something went wrong . . .");
             } finally {
-                action.setSubmitting(false);
+                actions.setSubmitting(false);
             }
-        }
-        _();
+        };
+        submitForm();
     };
 
     useEffect(() => {
@@ -70,7 +68,6 @@ const AddPost: React.FC = () => {
         if (profile) {
             dispatch(postImagesActions.globalReset());
             dispatch(getProfileGroups(profile.id));
-            console.log(store.getState().profile.groups);
         }
     }, [dispatch, profile, loadingStatus, navigate]);
 
@@ -117,27 +114,24 @@ const AddPost: React.FC = () => {
                                     <PropsPanel />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Grid item xs={12}>
-                                        <Select
-                                            name="group_id"
-                                            value={values.group_id || ""}
-                                            onChange={handleChange}
-                                            fullWidth
-                                        >
-                                            <MenuItem value="">
-                                                Select any of group
+                                    <Select
+                                        name="group_id"
+                                        value={values.group_id}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    >
+                                        <MenuItem value="">
+                                            Select any of group
+                                        </MenuItem>
+                                        {groups && groups.map((group) => (
+                                            <MenuItem key={group.uuid} value={group.uuid}>
+                                                {group.title}
                                             </MenuItem>
-                                            {groups &&
-                                                groups.map((group) => (
-                                                    <MenuItem
-                                                        key={group.uuid}
-                                                        value={group.uuid}
-                                                    >
-                                                        {group.title}
-                                                    </MenuItem>
-                                                ))}
-                                        </Select>
-                                    </Grid>
+                                        ))}
+                                    </Select>
+                                    <ErrorMessage name="group_id">
+                                        {(msg) => <Danger text={msg} />}
+                                    </ErrorMessage>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Carousel>

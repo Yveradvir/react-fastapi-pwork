@@ -1,5 +1,5 @@
 from fastapi import Path, Query
-from sqlalchemy import Select
+from sqlalchemy import Select, func
 
 from api_loader import *
 from base_loader import *
@@ -22,25 +22,31 @@ async def get_group(
     session: AsyncSession = Depends(db.get_session)
 ):
     access = jwtsecure.access_required(request)
-    group = (await get_scalar_by_uuid(group_id, session, GroupTable))
+    group = await get_scalar_by_uuid(group_id, session, GroupTable)
     memberships = (await session.execute(
         select(GroupUserMemberships).where(
-            GroupUserMemberships.user_id == access["payload"]["id"]
+            GroupUserMemberships.group_id == group_id
         ).where(
-            GroupUserMemberships.group_id == group.id
+            GroupUserMemberships.user_id == access["payload"]["id"]
         )
     )).scalar_one_or_none()
 
     if group:
+        posts_count = (
+            await session.execute(
+                select(func.count()).where(PostTable.group_id == group_id)
+            )
+        ).scalar_one_or_none()
+
         return JSONResponse(
             Subdated(
                 subdata={
-                        "group": group.to_dict(),
-                        "relation": {
-                            "memberships": memberships.to_dict(),
-                            "totalCount": len((await session.execute(select(PostTable).where(PostTable.group_id == group_id))).scalars().all())
-                        }
+                    "group": group.to_dict(),
+                    "relation": {
+                        "memberships": memberships.to_dict() if memberships else None,
+                        "totalCount": posts_count or 0
                     }
+                }
             ).model_dump()
         )
     else:
@@ -72,9 +78,9 @@ async def get_group_posts(
     posts = await session.execute(paginated_query)
     posts = posts.scalars().all()
 
-    posts_data = [{**post.to_dict(), **post.post_props.to_dict(), "main":post.post_images.get_main()} for post in posts]
+    posts_data = [{**post.to_dict(), **post.post_props.to_dict(), "main": post.post_images.get_main()} for post in posts]
 
-    return JSONResponse(Subdated(subdata=posts_data.model_dump()))
+    return JSONResponse(Subdated(subdata=posts_data).model_dump())
 
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)

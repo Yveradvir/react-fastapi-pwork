@@ -42,12 +42,13 @@ async def get_post(
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)
 async def new_post(
-    request: Request, body: PostMakeRequest,
+    request: Request,
+    body: PostMakeRequest,
     session: AsyncSession = Depends(db.get_session)
 ):
     access = jwtsecure.access_required(request)
     if access:
-        model_dict = {k: v for k, v in body.model_dump().items() if k not in {"post_props", "post_images"}}
+        model_dict = body.model_dump(exclude={"postProps", "postImages"})
         post = PostTable(
             **model_dict,
             author_id=access["payload"]["id"]
@@ -55,12 +56,10 @@ async def new_post(
 
         session.add(post)
         await session.commit()
+        await session.refresh(post)
 
-        post_props = PostPropsTable(**body.post_props.model_dump(), post_id=post.id)
-        images = {
-            k: b64decode(v.split(",")[1].encode())
-            for k, v in body.post_images.items() 
-        }
+        post_props = PostPropsTable(**body.postProps.model_dump(), post_id=post.id)
+        images = {k: b64decode(v.split(",")[1].encode()) for k, v in body.postImages.model_dump().items() if v}
 
         post_images = PostImagesTable(**images, post_id=post.id)
 
@@ -76,3 +75,5 @@ async def new_post(
             ).model_dump(),
             status_code=status.HTTP_201_CREATED
         )
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
