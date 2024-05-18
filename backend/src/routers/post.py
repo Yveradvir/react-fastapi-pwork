@@ -53,10 +53,26 @@ async def new_post(
             author_id=access["payload"]["id"]
         )
 
+        session.add(post)
+        await session.commit()
+
+        post_props = PostPropsTable(**body.post_props.model_dump(), post_id=post.id)
+        images = {
+            k: b64decode(v.split(",")[1].encode())
+            for k, v in body.post_images.items() 
+        }
+
+        post_images = PostImagesTable(**images, post_id=post.id)
+
+        session.add_all([post_props, post_images])
+        await session.commit()
+
         return JSONResponse(
             Subdated(
                 subdata={
-                    "result": "DSdas"
+                    "group_id": str(post.group_id),
+                    "post_id": str(post.id)
                 }
-            ).model_dump()
+            ).model_dump(),
+            status_code=status.HTTP_201_CREATED
         )

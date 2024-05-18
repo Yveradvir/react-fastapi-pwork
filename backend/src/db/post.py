@@ -12,6 +12,10 @@ class GroupTable(InitialMixin, db.base):
 
     posts = relationship("PostTable", backref="groups")
 
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+
+
 class GroupUserMemberships(InitialMixin, db.base):
     __tablename__ = "gumemberships"
 
@@ -21,6 +25,10 @@ class GroupUserMemberships(InitialMixin, db.base):
 
     group = relationship("GroupTable", backref="group_memberships")
     user = relationship("UserTable", backref="group_memberships")
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+
 
 class PostTable(InitialMixin, db.base):
     __tablename__ = "posts"
@@ -55,6 +63,9 @@ class PostPropsTable(InitialMixin, db.base):
     discord_tag = Column(String)
     telegram_tag = Column(String)
 
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+
 
 class PostImagesTable(InitialMixin, db.base):
     __tablename__ = "postimages"
@@ -67,6 +78,9 @@ class PostImagesTable(InitialMixin, db.base):
     third = Column(LargeBinary, nullable=True)
     fourth = Column(LargeBinary, nullable=True)
     fifth = Column(LargeBinary, nullable=True)
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     def get_main(self):
         return b64encode(

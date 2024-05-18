@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
+import { Formik, Field, ErrorMessage, Form as FForm, FormikHelpers } from "formik";
 import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
 import SpinnerButton from "@modules/components/submitspinner";
@@ -13,6 +13,7 @@ import { postImagesActions } from "@modules/reducers/post_images.slice";
 import { getProfileGroups } from "@modules/reducers/profile.slice";
 import PropsPanel from "./components/propsPanel";
 import { LoadingStatus } from "@modules/reducers/main";
+import { LaunchedAxios } from "@modules/api/api";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
@@ -41,14 +42,21 @@ const AddPost: React.FC = () => {
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
-    const onSubmitHandler = (values: PostValues) => {
+    const onSubmitHandler = (values: PostValues, action: FormikHelpers<PostValues>) => {
         const _ = async () => {
             try {
                 values.postImages = { ...store.getState().post_images.images };
                 console.log(values, store.getState().post_images.images);
-                setError("");
+                const response = await LaunchedAxios.post("/post/new", values)
+
+                if (response.data.ok) {
+                    const sdata = response.data.subdata
+                    navigate(`/post/${sdata.group_id}/${sdata.post_id}`)
+                }
             } catch (error) {
                 setError("Something went wrong . . .");
+            } finally {
+                action.setSubmitting(false);
             }
         }
         _();

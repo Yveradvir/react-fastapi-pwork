@@ -1,24 +1,21 @@
 from typing import Optional
 from .base_models import *
 
-class PostMakeRequest(BaseRequestModel):
-    class PostProsp(BaseModel):
-        rank: Optional[str]
+class PostProsp(BaseModel):
+    rank: Optional[str] = None
+    discord_tag: Optional[str] = None
+    telegram_tag: Optional[str] = None
 
-        discord_tag: Optional[str]
-        telegram_tag: Optional[str]
+class PostImages(BaseModel):
+    main: Optional[str] = None
+    second: Optional[str] = None
+    third: Optional[str] = None
+    fourth: Optional[str] = None
+    fifth: Optional[str] = None
 
-    class PostImages(BaseModel):
-        main: Optional[str]
-        
-        second: Optional[str]
-        third: Optional[str]
-        fourth: Optional[str]
-        fifth: Optional[str]
-
+class PostMakeRequest(BaseModel):
     title: str
     content: str
     group_id: str
-
     post_images: PostImages
     post_props: PostProsp

@@ -80,6 +80,7 @@ export const postsSlice = createSlice({
                 (state: PostsState, action: PayloadAction<PostEntity[]>) => {
                     postsAdapter.setAll(state, action.payload);
                     state.loadingStatus = LoadingStatus.Loaded;
+                    state.error = null;
                 }
             )
             .addCase(fetchPosts.rejected, (state: PostsState, action) => {

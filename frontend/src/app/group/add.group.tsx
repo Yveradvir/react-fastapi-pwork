@@ -6,36 +6,51 @@ import { useAppSelector } from "@modules/reducers";
 import { LoadingStatus } from "@modules/reducers/main";
 import { GroupSchema, GroupValues } from "@modules/validations/group.vd";
 import { Grid, TextField, Typography } from "@mui/material";
-import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
+import {
+    Formik,
+    Field,
+    ErrorMessage,
+    Form as FForm,
+    FormikHelpers,
+} from "formik";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const AddGroup: React.FC = () => {
     const navigate = useNavigate();
-    const {loadingStatus} = useAppSelector(state => state.profile)
+    const { loadingStatus } = useAppSelector((state) => state.profile);
     const initialValues: GroupValues = {
-        content: "", title: ""
-    }
+        content: "",
+        title: "",
+    };
     const [error, setError] = useState("");
 
-    const onSubmitHandler = async (values: GroupValues) => {
+    const onSubmitHandler = async (
+        values: GroupValues,
+        action: FormikHelpers<GroupValues>
+    ) => {
         try {
-            const response = await LaunchedAxios.post("/group/new", values)
+            const response = await LaunchedAxios.post("/group/new", values);
             if (response.data.ok) {
-                navigate(`/club/${response.data.subdata.result}`)
+                navigate(`/club/${response.data.subdata.result}`);
             }
             setError("");
         } catch (error) {
             setError("Something went wrong . . .");
+        } finally {
+            action.setSubmitting(false);
         }
     };
 
     useEffect(() => {
-        if ([LoadingStatus.Error, LoadingStatus.NotLoaded].includes(loadingStatus)) {
+        if (
+            [LoadingStatus.Error, LoadingStatus.NotLoaded].includes(
+                loadingStatus
+            )
+        ) {
             navigate("/auth/signin");
         }
-    }, [loadingStatus, navigate])
+    }, [loadingStatus, navigate]);
 
     return (
         <Layout needToFab={false}>
@@ -67,7 +82,7 @@ const AddGroup: React.FC = () => {
                                     <Field
                                         name="content"
                                         type="text"
-                                        as={TextField} 
+                                        as={TextField}
                                         label="Content"
                                         multiline
                                         fullWidth
@@ -89,6 +104,6 @@ const AddGroup: React.FC = () => {
             </div>
         </Layout>
     );
-}
+};
 
 export default AddGroup;

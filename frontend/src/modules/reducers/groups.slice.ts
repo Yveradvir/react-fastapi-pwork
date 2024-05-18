@@ -91,6 +91,7 @@ export const groupsSlice = createSlice({
                 (state: GroupsState, action: PayloadAction<GroupEntity[]>) => {
                     groupsAdapter.setAll(state, action.payload);
                     state.loadingStatus = LoadingStatus.Loaded;
+                    state.error = null;
                 }
             )
             .addCase(fetchGroups.rejected, (state: GroupsState, action) => {
@@ -101,6 +102,7 @@ export const groupsSlice = createSlice({
                 fetchCount.fulfilled,
                 (state: GroupsState, action) => {
                     state.totalCount = action.payload;
+                    state.error = null;
                 }
             )
             .addCase(fetchCount.rejected, (state: GroupsState, action) => {

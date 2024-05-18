@@ -103,6 +103,7 @@ const profileSlice = createSlice({
                 ) => {
                     state.profile = action.payload;
                     state.loadingStatus = LoadingStatus.Loaded;
+                    state.error = null;
                 }
             )
             .addCase(getProfile.rejected, (state: CurrentProfileState, action) => {                
@@ -125,6 +126,7 @@ const profileSlice = createSlice({
                         } else { 
                             state.profileImageStatus = LoadingStatus.Loaded;
                         } 
+                        state.error = null;
                     }
                 }
             )
@@ -140,6 +142,7 @@ const profileSlice = createSlice({
                 ) => {
                     if (state.profile) {
                         state.groups = action.payload;
+                        state.error = null;
                     }
                 }
             )

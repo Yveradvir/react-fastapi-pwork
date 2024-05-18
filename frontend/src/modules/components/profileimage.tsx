@@ -12,51 +12,30 @@ interface ProfileImageProps {
 
 const ProfileImage: React.FC<ProfileImageProps> = ({ uid, w = 64, h = 64 }) => {
     const dispatch = useAppDispatch();
-    const selector = useAppSelector((state) => state);
+    const { profile, profileImageStatus } = useAppSelector((state) => state.profile);
 
     useEffect(() => {
-        let is_ignore = false;
-
-        if (!is_ignore) {
-            if (
-                !selector.profile.profile?.profile_b64 &&
-                selector.profile.profileImageStatus === LoadingStatus.NotLoaded
-            ) {
-                dispatch(getProfileImage(uid));
-            }
+        if (!profile?.profile_b64 && profileImageStatus === LoadingStatus.ANotLoaded) {
+            dispatch(getProfileImage(uid));
         }
+    }, [dispatch, profile?.profile_b64, profileImageStatus, uid]);
 
-        return () => {
-            is_ignore = true;
-        };
-    }, [dispatch, selector.profile.profile?.profile_b64, selector.profile.profileImageStatus, uid]);
-
-    const profileB64 = selector.profile.profile?.profile_b64;
-
-    if (selector.profile.profileImageStatus === LoadingStatus.Loaded) {
-        if (!selector.profile.profile?.profile_b64) {
-            return (
-                <Avatar
-                    alt="Profile"
-                    src="https://static-00.iconduck.com/assets.00/user-avatar-1-icon-511x512-ynet6qk9.png"
-                    style={{ width: w, height: h }}
-                />
-            );
-        }
+    if (profileImageStatus === LoadingStatus.Loaded) {
         return (
             <Avatar
                 alt="Profile"
-                src={profileB64}
+                src={profile?.profile_b64 || "https://static-00.iconduck.com/assets.00/user-avatar-1-icon-511x512-ynet6qk9.png"}
                 style={{ width: w, height: h }}
             />
         );
-    } else if (selector.profile.profileImageStatus === LoadingStatus.Loading) {
+    } else if (profileImageStatus === LoadingStatus.Loading) {
         return (
             <CircularProgress
                 size={Math.min(w, h)}
             />
         );
     }
+
     return null;
 };
 
