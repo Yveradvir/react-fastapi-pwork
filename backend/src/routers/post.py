@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import Path
 
 from api_loader import *
+from src.models.post import PostMakeRequest
 from base_loader import *
 
 from src.db.utils import get_scalar_by_uuid
@@ -41,12 +42,16 @@ async def get_post(
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)
 async def new_post(
-    request: Request, body: GroupMakeRequest,
+    request: Request, body: PostMakeRequest,
     session: AsyncSession = Depends(db.get_session)
 ):
     access = jwtsecure.access_required(request)
-
     if access:
+        model_dict = {k: v for k, v in body.model_dump().items() if k not in {"post_props", "post_images"}}
+        post = PostTable(
+            **model_dict,
+            author_id=access["payload"]["id"]
+        )
 
         return JSONResponse(
             Subdated(

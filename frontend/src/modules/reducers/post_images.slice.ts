@@ -21,7 +21,7 @@ const initialState: PostImagesState = {
         fourth: "",
         fifth: "",
     },
-    loadingStatus: LoadingStatus.NotLoaded,
+    loadingStatus: LoadingStatus.ANotLoaded,
     error: null,
 };
 

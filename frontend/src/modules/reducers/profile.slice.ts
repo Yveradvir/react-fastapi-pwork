@@ -85,8 +85,8 @@ const profileSlice = createSlice({
     initialState: {
         profile: null,
         groups: null,
-        loadingStatus: LoadingStatus.NotLoaded,
-        profileImageStatus: LoadingStatus.NotLoaded,
+        loadingStatus: LoadingStatus.ANotLoaded,
+        profileImageStatus: LoadingStatus.ANotLoaded,
         error: null,
     } as CurrentProfileState,
     reducers: {},
@@ -105,9 +105,7 @@ const profileSlice = createSlice({
                     state.loadingStatus = LoadingStatus.Loaded;
                 }
             )
-            .addCase(getProfile.rejected, (state: CurrentProfileState, action) => {
-                console.log(action);
-                
+            .addCase(getProfile.rejected, (state: CurrentProfileState, action) => {                
                 state.loadingStatus = LoadingStatus.Error;
                 state.error = action.payload as RejectedError;
             })
@@ -122,7 +120,11 @@ const profileSlice = createSlice({
                 ) => {
                     if (state.profile) {
                         state.profile.profile_b64 = action.payload;
-                        state.profileImageStatus = LoadingStatus.Loaded;
+                        if (action.payload == null) {
+                            state.profileImageStatus = LoadingStatus.NotLoaded;
+                        } else { 
+                            state.profileImageStatus = LoadingStatus.Loaded;
+                        } 
                     }
                 }
             )

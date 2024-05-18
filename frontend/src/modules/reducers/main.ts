@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 
 export enum LoadingStatus {
+    ANotLoaded = "absolute not loaded",
     NotLoaded = "not loaded",
     Loading = "loading",
     Loaded = "loaded",

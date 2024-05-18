@@ -38,12 +38,12 @@ export interface PostsState extends EntityState<PostEntity, EntityId> {
 }
 
 export const postsAdapter = createEntityAdapter<PostEntity>();
-export const fetchPosts = createAsyncThunk<PostEntity[], number>(
+export const fetchPosts = createAsyncThunk<PostEntity[], {page: number; group_id: string | undefined}>(
     "posts/fetchStatus",
-    async (page, thunkAPI) => {
+    async ({page, group_id}, thunkAPI) => {
         try {
             const filter = store.getState().filter.filter;
-            const response = await LaunchedAxios.get("/group/", {
+            const response = await LaunchedAxios.get(`/group/single/${group_id}/posts`, {
                 params: {
                     ...filter,
                     page,
@@ -59,7 +59,7 @@ export const fetchPosts = createAsyncThunk<PostEntity[], number>(
 );
 
 export const initialPostsState: PostsState = postsAdapter.getInitialState({
-    loadingStatus: LoadingStatus.NotLoaded,
+    loadingStatus: LoadingStatus.ANotLoaded,
     error: null,
 });
 

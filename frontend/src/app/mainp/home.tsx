@@ -12,7 +12,7 @@ const Home: React.FC = () => {
     const { profile, loadingStatus, error } = useAppSelector((state) => state.profile);
 
     useEffect(() => {
-        if (loadingStatus === LoadingStatus.NotLoaded) {
+        if (loadingStatus === LoadingStatus.ANotLoaded) {
             dispatch(getProfile());
         }
     }, [dispatch, loadingStatus]);

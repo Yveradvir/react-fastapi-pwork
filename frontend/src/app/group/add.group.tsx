@@ -2,15 +2,18 @@ import { LaunchedAxios } from "@modules/api/api";
 import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
 import SpinnerButton from "@modules/components/submitspinner";
+import { useAppSelector } from "@modules/reducers";
+import { LoadingStatus } from "@modules/reducers/main";
 import { GroupSchema, GroupValues } from "@modules/validations/group.vd";
 import { Grid, TextField, Typography } from "@mui/material";
 import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
 const AddGroup: React.FC = () => {
     const navigate = useNavigate();
+    const {loadingStatus} = useAppSelector(state => state.profile)
     const initialValues: GroupValues = {
         content: "", title: ""
     }
@@ -27,6 +30,12 @@ const AddGroup: React.FC = () => {
             setError("Something went wrong . . .");
         }
     };
+
+    useEffect(() => {
+        if ([LoadingStatus.Error, LoadingStatus.NotLoaded].includes(loadingStatus)) {
+            navigate("/auth/signin");
+        }
+    }, [loadingStatus, navigate])
 
     return (
         <Layout needToFab={false}>

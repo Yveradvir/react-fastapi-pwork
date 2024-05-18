@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Formik, Field, ErrorMessage, Form as FForm } from "formik";
 import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
@@ -11,8 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { store, useAppDispatch, useAppSelector } from "@modules/reducers";
 import { postImagesActions } from "@modules/reducers/post_images.slice";
 import { getProfileGroups } from "@modules/reducers/profile.slice";
-import { LoadingStatus } from "@modules/reducers/main";
 import PropsPanel from "./components/propsPanel";
+import { LoadingStatus } from "@modules/reducers/main";
 
 const AddPost: React.FC = () => {
     const navigate = useNavigate();
@@ -26,45 +26,44 @@ const AddPost: React.FC = () => {
         title: "",
         content: "",
         postImages: {
-            main: undefined,
-            second: undefined,
-            third: undefined,
-            fourth: undefined,
-            fifth: undefined,
+            main: "",
+            second: "",
+            third: "",
+            fourth: "",
+            fifth: "",
         },
         postProps: {
-            discord_tag: undefined,
-            telegram_tag: undefined,
-            rank: undefined,
+            discord_tag: "",
+            telegram_tag: "",
+            rank: "",
         },
-        group_id: ""
+        group_id: "",
     };
     const _postImagesKeys = ["main", "second", "third", "fourth", "fifth"];
 
-    const onSubmitHandler = async (values: PostValues) => {
-        try {
-            values.postImages = store.getState().post_images.images!;
-            console.log(values, store.getState().post_images.images!);
-            setError("");
-        } catch (error) {
-            setError("Something went wrong . . .");
+    const onSubmitHandler = (values: PostValues) => {
+        const _ = async () => {
+            try {
+                values.postImages = { ...store.getState().post_images.images };
+                console.log(values, store.getState().post_images.images);
+                setError("");
+            } catch (error) {
+                setError("Something went wrong . . .");
+            }
         }
+        _();
     };
 
     useEffect(() => {
-        if (loadingStatus !== LoadingStatus.Loaded) navigate("/auth/signin");
-        let is_ignore = false;
-
-        if (!is_ignore) {
-            dispatch(postImagesActions.globalReset());
-            dispatch(getProfileGroups(profile!.id));
-            console.log(store.getState().profile.groups);
-            
+        if ([LoadingStatus.Error, LoadingStatus.NotLoaded].includes(loadingStatus)) {
+            navigate("/auth/signin");
         }
 
-        return () => {
-            is_ignore = true;
-        };
+        if (profile) {
+            dispatch(postImagesActions.globalReset());
+            dispatch(getProfileGroups(profile.id));
+            console.log(store.getState().profile.groups);
+        }
     }, [dispatch, profile, loadingStatus, navigate]);
 
     return (
@@ -78,7 +77,7 @@ const AddPost: React.FC = () => {
                     validationSchema={PostSchema}
                     onSubmit={onSubmitHandler}
                 >
-                    {({ isSubmitting }) => (
+                    {({ isSubmitting, values, handleChange }) => (
                         <FForm noValidate>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
@@ -111,46 +110,25 @@ const AddPost: React.FC = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid item xs={12}>
-                                        {groups ? (
-                                            <Select>
-                                                <MenuItem
-                                                    value={"Select any of group"}
-                                                    selected
-                                                >Select any of group</MenuItem>
-                                                {groups.map((key) => (
+                                        <Select
+                                            name="group_id"
+                                            value={values.group_id || ""}
+                                            onChange={handleChange}
+                                            fullWidth
+                                        >
+                                            <MenuItem value="">
+                                                Select any of group
+                                            </MenuItem>
+                                            {groups &&
+                                                groups.map((group) => (
                                                     <MenuItem
-                                                        key={key.uuid}
-                                                        value={key.uuid as string}
+                                                        key={group.uuid}
+                                                        value={group.uuid}
                                                     >
-                                                        {key.title}
+                                                        {group.title}
                                                     </MenuItem>
                                                 ))}
-                                            </Select>
-                                        ) : (
-                                            <Box
-                                                display="flex"
-                                                alignItems="center"
-                                            >
-                                                <Typography
-                                                    variant="body1"
-                                                    color="textSecondary"
-                                                    style={{
-                                                        marginRight: "8px",
-                                                    }}
-                                                >
-                                                    You don't have any groups
-                                                    yet! Let's find you a new
-                                                    one:
-                                                </Typography>
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    onClick={() => navigate("/group/")}
-                                                >
-                                                    Find Group
-                                                </Button>
-                                            </Box>
-                                        )}
+                                        </Select>
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={12}>

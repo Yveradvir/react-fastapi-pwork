@@ -69,7 +69,7 @@ export const fetchGroups = createAsyncThunk<
 });
 
 export const initialGroupsState: GroupsState = groupsAdapter.getInitialState({
-    loadingStatus: LoadingStatus.NotLoaded,
+    loadingStatus: LoadingStatus.ANotLoaded,
     error: null,
     totalCount: 10,
 });

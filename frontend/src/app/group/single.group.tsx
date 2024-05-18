@@ -35,9 +35,9 @@ const SingleGroup: React.FC = () => {
 
     const handleChangePage = useCallback(
         (_event: React.ChangeEvent<unknown> | null, page: number) => {
-            dispatch(fetchPosts(page));
+            dispatch(fetchPosts({page, group_id}));
         },
-        [dispatch]
+        [dispatch, group_id]
     );
 
     useEffect(() => {
