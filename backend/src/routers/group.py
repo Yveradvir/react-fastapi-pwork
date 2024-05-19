@@ -5,7 +5,7 @@ from api_loader import *
 from base_loader import *
 from sqlalchemy.orm import joinedload
 
-from src.db.utils import AccessEnum, FilterTypes, filtrating, get_scalar_by_uuid
+from src.db.utils import AccessEnum, FilterTypes, filtrating, get_scalar_by_uuid, max_memberships
 from src.db.auth import UserTable, ProfileImageTable
 from src.db.post import GroupTable, GroupUserMemberships, PostTable
 
@@ -15,6 +15,67 @@ from src.models.group import GroupMakeRequest
 
 router = APIRouter(prefix="/group")
 subrouter = APIRouter(prefix="/single")
+
+@subrouter.post("/{group_id}/membership", status_code=status.HTTP_201_CREATED)
+async def join(
+    request: Request,
+    group_id: str = Path(..., title="Group ID"), 
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    uid = access["payload"]["id"]
+    group = await get_scalar_by_uuid(group_id, session, GroupTable)
+    await max_memberships(session, uid)
+    is_exist = (await session.execute(
+        select(GroupUserMemberships)
+            .where(GroupUserMemberships.group_id == group_id)
+            .where(GroupUserMemberships.user_id == uid)
+    )).scalar_one_or_none()
+
+    if not is_exist:
+        membership = GroupUserMemberships(
+            user_id=uid, group_id=group_id, access=0
+        )
+
+        session.add(membership)
+        await session.commit()
+
+        return JSONResponse(
+            Subdated(
+                subdata=membership.to_dict()
+            ).model_dump(), status.HTTP_200_OK
+        )
+    else:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Memberships is arleady exist"
+        )
+    
+@subrouter.delete("/{group_id}/membership", status_code=status.HTTP_200_OK)
+async def leave(
+    request: Request,
+    group_id: str = Path(..., title="Group ID"), 
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    uid = access["payload"]["id"]
+    is_exist = (await session.execute(
+        select(GroupUserMemberships)
+            .where(GroupUserMemberships.group_id == group_id)
+            .where(GroupUserMemberships.user_id == uid)
+    )).scalar_one_or_none()
+
+    if is_exist:
+        await session.delete(is_exist)
+        await session.commit()
+        print(is_exist.to_dict())
+
+        return JSONResponse(
+            Subdated(subdata={}).model_dump(), status.HTTP_200_OK
+        )
+    else:
+        raise HTTPException(
+            status.HTTP_404, "Memberships is not exist"
+        )
 
 @subrouter.get("/{group_id}", status_code=status.HTTP_200_OK)
 async def get_group(
@@ -83,7 +144,7 @@ async def get_group_posts(
 
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)
-async def new_post(
+async def new_group(
     request: Request, body: GroupMakeRequest,
     session: AsyncSession = Depends(db.get_session)
 ):
@@ -91,6 +152,8 @@ async def new_post(
 
     if access:
         uid = access["payload"]["id"]
+        await max_memberships(session, uid)
+
         group = GroupTable(
             **body.model_dump(),
             author_id=uid

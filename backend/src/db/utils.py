@@ -8,6 +8,8 @@ from sqlalchemy import Table
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from src.db.post import GroupUserMemberships
+
 from .auth import UserTable
 
 async def get_scalar_by_uuid(
@@ -50,3 +52,11 @@ async def filtrating(f, ft, base_query, table):
         base_query = base_query.order_by(table.created_at.asc())
 
     return base_query
+
+async def max_memberships(session: AsyncSession, user_id):
+    q = select(GroupUserMemberships).where(
+        GroupUserMemberships.user_id == user_id
+    )
+
+    if len((await session.execute(q)).scalars().all()) >= 10:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You cannot be a member more than 10 groups (Including your own)")

@@ -49,7 +49,7 @@ const AddPost: React.FC = () => {
                 
                 if (response.data.ok) {
                     const sdata = response.data.subdata;
-                    navigate(`/post/${sdata.group_id}/${sdata.post_id}`);
+                    navigate(`/group/${sdata.group_id}/${sdata.post_id}`);
                 }
             } catch (error) {
                 setError("Something went wrong . . .");

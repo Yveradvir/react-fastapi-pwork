@@ -21,11 +21,14 @@ import {
     Typography,
     CardMedia,
     Box,
+    Snackbar,
+    IconButton,
 } from "@mui/material";
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { IoLogoDiscord } from "react-icons/io5";
+import { IoCloseCircleOutline, IoLogoDiscord } from "react-icons/io5";
+import LeaveJoinButton from "./leave-join";
 
 interface Relation {
     totalCount: number;
@@ -48,6 +51,7 @@ const SingleGroup: React.FC = () => {
     const [totalCount, setTotalCount] = useState<number | null>(null);
     const [group, setGroup] = useState<ISingleGroup | null>(null);
     const [error, setError] = useState<RejectedError | null>(null);
+    const [joinError, setJoinError] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
     const posts = useAppSelector((state) => state.posts);
@@ -91,9 +95,30 @@ const SingleGroup: React.FC = () => {
             isIgnore = true;
         };
     }, [group_id]);
+    const action = (
+        <>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={() => {setJoinError(false)}}
+            >
+                <IoCloseCircleOutline fontSize="small" />
+            </IconButton>
+        </>
+    );
 
     return (
         <Layout>
+            <Snackbar
+                open={joinError}
+                autoHideDuration={6000}
+                onClose={() => {
+                    setJoinError(false);
+                }}
+                message="You cannot be a member more than 10 groups (Including your own)"
+                action={action}
+            />
             {error ? (
                 <ErrorPage
                     status_code={error.status_code}
@@ -101,22 +126,11 @@ const SingleGroup: React.FC = () => {
                 />
             ) : (
                 <>
-                    {group?.relation.membership == null && (
-                        <Button
-                            style={{
-                                position: "fixed",
-                                bottom: "16px",
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                zIndex: 1000,
-                            }}
-                            color="success"
-                            variant="contained"
-                        >
-                            Join
-                        </Button>
-                    )}
-
+                    <LeaveJoinButton
+                        group_id={group_id}
+                        membership={group?.relation.membership}
+                        setError={setJoinError}
+                    />
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={4}>
                             {group && (

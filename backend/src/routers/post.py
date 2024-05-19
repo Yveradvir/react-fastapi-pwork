@@ -1,16 +1,14 @@
-from uuid import UUID
 from fastapi import Path
+from sqlalchemy.orm import selectinload
 
 from api_loader import *
 from src.models.post import PostMakeRequest
 from base_loader import *
 
 from src.db.utils import get_scalar_by_uuid
-from src.db.auth import UserTable, ProfileImageTable
 from src.db.post import PostTable, PostPropsTable, PostImagesTable
 
 from src.models.base_models import Subdated
-from src.models.group import GroupMakeRequest
 
 
 router = APIRouter(prefix="/post")
@@ -18,20 +16,28 @@ subrouter = APIRouter(prefix="/single")
 
 @subrouter.get("/{post_id}", status_code=status.HTTP_200_OK)
 async def get_post(
+    request: Request,
     post_id: str = Path(..., title="Post ID"), 
     session: AsyncSession = Depends(db.get_session)
 ):
-    post: PostTable = (await get_scalar_by_uuid(post_id, session, PostTable))
-    
+    access = jwtsecure.access_required(request)
+    result = (await session.execute(
+            select(PostTable).options(selectinload(PostTable.post_props), selectinload(PostTable.post_images)).filter(PostTable.id == post_id)
+    ))
+    post = result.scalars().first()
+
     if post:
         return JSONResponse(
             Subdated(
                 subdata={
-                    **post.to_dict(), 
-                    "post_props": post.post_props.to_dict(),
-                    "post_images": post.post_props.to_dict()
+                    "post": {
+                        **post.to_dict(),
+                        "postProps": post.post_props.to_dict(),
+                        "postImages": post.post_images.to_dict()
+                    },
+                    "am_author": str(post.author_id) == access["payload"]["id"]
                 }
-            ).model_dump()
+            ).model_dump(), status.HTTP_200_OK
         )
     else:
         raise HTTPException(
@@ -77,3 +83,4 @@ async def new_post(
         )
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
