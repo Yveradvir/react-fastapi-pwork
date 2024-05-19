@@ -1,4 +1,5 @@
 from api_loader import *
+from src.models.base_models import Subdated
 from base_loader import *
 
 from src.db.auth import UserTable, ProfileImageTable
@@ -106,3 +107,23 @@ async def signin(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User doesn't exists"
         )
+    
+@router.post("/refresh", status_code=status.HTTP_200_OK)
+async def refresh(
+    request: Request
+):
+    access = jwtsecure.refresh_required(request)
+
+    new, new_csrf = jwtsecure.create_access_token(data={"id": access["payload"]["id"]})
+    
+    response = JSONResponse(
+        Subdated(
+            subdata={
+                "access": new
+            }
+        ).model_dump(), status.HTTP_200_OK
+    )
+
+    jwtsecure.set_access_cookie(response, new)
+
+    return response

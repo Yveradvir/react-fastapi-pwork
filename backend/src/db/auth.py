@@ -4,6 +4,8 @@ from . import db
 class UserTable(InitialMixin, db.base):
     __tablename__ = "users"
 
+    api_key = Column(Text, nullable=True)
+
     username = Column(String(40), nullable=False, unique=True)
     first_name = Column(String(40), nullable=False)
     last_name = Column(String(40), nullable=False)

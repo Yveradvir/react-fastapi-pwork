@@ -29,7 +29,7 @@ import { IoLogoDiscord } from "react-icons/io5";
 
 interface Relation {
     totalCount: number;
-    memberships?: {
+    membership?: {
         user_id: string;
         group_id: string;
         access: number;
@@ -101,7 +101,7 @@ const SingleGroup: React.FC = () => {
                 />
             ) : (
                 <>
-                    {group?.relation.memberships == null && (
+                    {group?.relation.membership == null && (
                         <Button
                             style={{
                                 position: "fixed",
