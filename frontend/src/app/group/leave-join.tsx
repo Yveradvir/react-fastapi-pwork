@@ -9,12 +9,14 @@ interface LeaveJoinButtonProps {
         group_id: string;
         access: number;
     } | null;
+    callback: Promise<void>
 }
 
 const LeaveJoinButton: React.FC<LeaveJoinButtonProps> = ({
     group_id,
     setError,
     membership,
+    callback
 }) => {
     if (membership == null) {
         return (
@@ -34,13 +36,14 @@ const LeaveJoinButton: React.FC<LeaveJoinButtonProps> = ({
                             await LaunchedAxios.post(
                                 `/group/single/${group_id}/membership`
                             );
+                            callback();
                         } catch (error) {
                             setError(true);
                         }
                     };
                     _();
                 }}
-            >
+                >
                 Join
             </Button>
         );
@@ -62,6 +65,7 @@ const LeaveJoinButton: React.FC<LeaveJoinButtonProps> = ({
                             await LaunchedAxios.delete(
                                 `/group/single/${group_id}/membership`
                             );
+                            callback();
                         };
                         _();
                     }}

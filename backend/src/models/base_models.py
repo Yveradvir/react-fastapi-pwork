@@ -24,6 +24,7 @@ class Paged(BaseModel):
     f: Optional[str] = Query(None, title="Filter value/s")
     ft: str = Query(FilterTypes.new.name, title="Filter type")
     page: int = Query(1, title="Page")
+    activeType: str = Query("all", title="Active type(Only for posts)") 
     isMine: bool = Query(False)
 
 __all__ = [

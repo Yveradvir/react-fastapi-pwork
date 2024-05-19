@@ -46,7 +46,7 @@ interface ISingleGroup {
 
 const SingleGroup: React.FC = () => {
     const navigate = useNavigate();
-    const { group_id } = useParams();
+    const { group_id } = useParams<{ group_id: string }>();
     const [page, setPage] = useState<number>(1);
     const [totalCount, setTotalCount] = useState<number | null>(null);
     const [group, setGroup] = useState<ISingleGroup | null>(null);
@@ -64,50 +64,38 @@ const SingleGroup: React.FC = () => {
         [dispatch, group_id]
     );
 
+    const handleGroupPage = useCallback(async () => {
+        try {
+            const response = await LaunchedAxios.get(`/group/single/${group_id}`);
+            if (response.data.ok) {
+                setGroup(response.data.subdata);
+                setTotalCount(response.data.subdata.relation.totalCount);
+            } else {
+                setError(ReduxRejfullTools.standartReject());
+            }
+        } catch (err) {
+            setError(ReduxRejfullTools.standartAxiosReject(err));
+        }
+    }, [group_id]);
+
     useEffect(() => {
         handleChangePage(null, 1);
     }, [handleChangePage]);
 
     useEffect(() => {
-        let isIgnore = false;
+        handleGroupPage();
+    }, [group_id, handleGroupPage]);
 
-        const _ = async () => {
-            try {
-                const response = await LaunchedAxios.get(
-                    `/group/single/${group_id}`
-                );
-
-                if (response.data.ok && !isIgnore) {
-                    setGroup(response.data.subdata);
-                    setTotalCount(response.data.subdata.relation.totalCount);
-                } else if (!isIgnore) {
-                    setError(ReduxRejfullTools.standartReject());
-                }
-            } catch (err) {
-                if (!isIgnore)
-                    setError(ReduxRejfullTools.standartAxiosReject(err));
-            }
-        };
-
-        _();
-
-        return () => {
-            isIgnore = true;
-        };
-    }, [group_id]);
     const action = (
-        <>
-            <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={() => {setJoinError(false)}}
-            >
-                <IoCloseCircleOutline fontSize="small" />
-            </IconButton>
-        </>
+        <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={() => setJoinError(false)}
+        >
+            <IoCloseCircleOutline fontSize="small" />
+        </IconButton>
     );
-
     return (
         <Layout>
             <Snackbar
@@ -130,6 +118,7 @@ const SingleGroup: React.FC = () => {
                         group_id={group_id}
                         membership={group?.relation.membership}
                         setError={setJoinError}
+                        callback={handleGroupPage}
                     />
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={4}>

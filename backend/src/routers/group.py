@@ -125,6 +125,10 @@ async def get_group_posts(
 ):
     offset = (paged.page - 1) * PAGINATION_UNIT
 
+    base_query = select(PostTable).where(
+        PostTable.active == True if paged.activeType == "active" else False
+    ) if paged.activeType != "all" else select(PostTable)
+
     base_query = (await filtrating(paged.f, paged.ft, select(PostTable), PostTable)).where(PostTable.group_id == group_id).options(
         joinedload(PostTable.post_props),
         joinedload(PostTable.post_images)
