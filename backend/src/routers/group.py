@@ -3,6 +3,7 @@ from sqlalchemy import Select, func
 
 from api_loader import *
 from base_loader import *
+from sqlalchemy.orm import joinedload
 
 from src.db.utils import AccessEnum, FilterTypes, filtrating, get_scalar_by_uuid
 from src.db.auth import UserTable, ProfileImageTable
@@ -23,7 +24,7 @@ async def get_group(
 ):
     access = jwtsecure.access_required(request)
     group = await get_scalar_by_uuid(group_id, session, GroupTable)
-    memberships = (await session.execute(
+    membership = (await session.execute(
         select(GroupUserMemberships).where(
             GroupUserMemberships.group_id == group_id
         ).where(
@@ -43,7 +44,7 @@ async def get_group(
                 subdata={
                     "group": group.to_dict(),
                     "relation": {
-                        "memberships": memberships.to_dict() if memberships else None,
+                        "membership": membership.to_dict() if membership else None,
                         "totalCount": posts_count or 0
                     }
                 }
@@ -61,24 +62,22 @@ async def get_group_posts(
     paged: Paged = Depends(),
     session: AsyncSession = Depends(db.get_session)
 ):
-    if paged.isMine:
-        access = jwtsecure.access_required()
     offset = (paged.page - 1) * PAGINATION_UNIT
 
-    base_query = select(PostTable).where(PostTable.group_id == group_id)
-    if paged.isMine: 
-        base_query = base_query.where(PostTable.id == access["payload"]["id"])
-    base_query: Select[Tuple[PostTable]] = await filtrating(
-        paged.f, paged.ft, base_query, PostTable
+    base_query = (await filtrating(paged.f, paged.ft, select(PostTable), PostTable)).where(PostTable.group_id == group_id).options(
+        joinedload(PostTable.post_props),
+        joinedload(PostTable.post_images)
     )
-
-
+    
     paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
+    result = (await session.execute(paginated_query))
+    posts = result.scalars().all()
 
-    posts = await session.execute(paginated_query)
-    posts = posts.scalars().all()
-
-    posts_data = [{**post.to_dict(), **post.post_props.to_dict(), "main": post.post_images.get_main()} for post in posts]
+    posts_data = [{
+        **post.to_dict(), 
+        "post_props": post.post_props.to_dict(), 
+        "main": post.post_images.get_main()
+    } for post in posts]
 
     return JSONResponse(Subdated(subdata=posts_data).model_dump())
 

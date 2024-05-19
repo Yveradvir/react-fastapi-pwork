@@ -5,7 +5,7 @@ from . import db
 class GroupTable(InitialMixin, db.base):
     __tablename__ = "groups"
 
-    title = Column(String(80), nullable=False)
+    title = Column(String(80), nullable=False, unique=True)
     content = Column(Text)
 
     author_id = Column(Uuid(as_uuid=True), ForeignKey('users.id'))
@@ -38,6 +38,7 @@ class PostTable(InitialMixin, db.base):
 
     title = Column(String(80), nullable=False)
     content = Column(Text, nullable=False)
+    active = Column(Boolean, default=True)
 
     post_props = relationship("PostPropsTable", uselist=False, backref="posts")
     post_images = relationship("PostImagesTable", uselist=False, backref="posts")
@@ -85,4 +86,4 @@ class PostImagesTable(InitialMixin, db.base):
     def get_main(self):
         return b64encode(
             self.main
-        ).decode()
+        ).decode() if self.main else None

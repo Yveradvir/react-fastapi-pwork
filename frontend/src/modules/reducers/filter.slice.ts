@@ -9,8 +9,15 @@ export enum FilterTypes {
     title = "title"
 }
 
+export enum ActiveTypes {
+    all = "all",
+    active = "active",
+    inactive = "inactive"
+}
+
 export interface FilterEntity {
     f?: string | null;
+    active?: ActiveTypes | null;
     ft: FilterTypes;
 }
 
@@ -21,6 +28,7 @@ export interface FilterState {
 
 const initialState: FilterState = {
     filter: {
+        active: ActiveTypes.all,
         ft: FilterTypes.new,
         f: ""
     },
