@@ -9,7 +9,7 @@ interface LeaveJoinButtonProps {
         group_id: string;
         access: number;
     } | null;
-    callback: Promise<void>
+    callback: () => Promise<void>
 }
 
 const LeaveJoinButton: React.FC<LeaveJoinButtonProps> = ({

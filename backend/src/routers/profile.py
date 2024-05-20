@@ -1,8 +1,10 @@
 from uuid import UUID
 from fastapi import Path
+from httpx import options
+from sqlalchemy.orm import selectinload
 
 from api_loader import *
-from src.db.post import GroupTable
+from src.db.post import GroupTable, GroupUserMemberships
 from base_loader import *
 
 from src.db.utils import get_scalar_by_uuid
@@ -73,15 +75,17 @@ async def get_profile_groups(
     user = (await get_scalar_by_uuid(user_id, session))
 
     if user:
-        groups = (await session.execute(
-            select(GroupTable).where(GroupTable.author_id == user.id)
+        memberships = (await session.execute(
+            select(GroupUserMemberships)
+                .where(GroupUserMemberships.user_id == user.id)
+                .options(selectinload(GroupUserMemberships.group))
         )).scalars().all()
 
         return JSONResponse(
             Subdated(
                 subdata=[
-                    {"title": group.title, "uuid": str(group.id)} 
-                    for group in groups
+                    {"title": m.group.title, "uuid": str(m.group.id)} 
+                    for m in memberships
                 ]
             ).model_dump()
         )

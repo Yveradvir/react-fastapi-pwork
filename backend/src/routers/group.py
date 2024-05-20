@@ -117,6 +117,37 @@ async def get_group(
             detail="Group is not found"
         )
 
+@subrouter.delete("/{group_id}", status_code=status.HTTP_200_OK)
+async def delete_group(
+    request: Request,
+    group_id: str = Path(..., title="Group ID"), 
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    group = await get_scalar_by_uuid(group_id, session, GroupTable)
+    membership = (await session.execute(
+        select(GroupUserMemberships).where(
+            GroupUserMemberships.group_id == group_id
+        ).where(
+            GroupUserMemberships.user_id == access["payload"]["id"]
+        )
+    )).scalar_one_or_none()
+
+    if group:
+        if membership.access == 2:
+            await session.delete()
+
+            return JSONResponse(
+                Subdated(subdata={}).model_dump()
+            )
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the author of the post")
+    else:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Group is not found"
+        )
+
 @subrouter.get("/{group_id}/posts", status_code=status.HTTP_200_OK)
 async def get_group_posts(
     group_id: str = Path(..., title="Group ID"), 
@@ -126,21 +157,24 @@ async def get_group_posts(
     offset = (paged.page - 1) * PAGINATION_UNIT
 
     base_query = select(PostTable).where(
-        PostTable.active == True if paged.activeType == "active" else False
-    ) if paged.activeType != "all" else select(PostTable)
-
-    base_query = (await filtrating(paged.f, paged.ft, select(PostTable), PostTable)).where(PostTable.group_id == group_id).options(
-        joinedload(PostTable.post_props),
-        joinedload(PostTable.post_images)
+        PostTable.active == True if paged.active == "active" else False
+    ) if paged.active != "all" else select(PostTable)
+        
+    base_query = ((await filtrating(paged.f, paged.ft, base_query, PostTable))
+        .where(PostTable.group_id == group_id)
+        .options(
+            joinedload(PostTable.post_props),
+            joinedload(PostTable.post_images)
+        )
     )
     
     paginated_query = base_query.offset(offset).limit(PAGINATION_UNIT)
-    result = (await session.execute(paginated_query))
-    posts = result.scalars().all()
+    result = await session.execute(paginated_query)
+    posts = result.unique().scalars().all()  
 
     posts_data = [{
-        **post.to_dict(), 
-        "post_props": post.post_props.to_dict(), 
+        **post.to_dict(),
+        "post_props": post.post_props.to_dict(),
         "main": post.post_images.get_main()
     } for post in posts]
 

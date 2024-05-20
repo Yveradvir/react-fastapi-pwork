@@ -64,10 +64,10 @@ const AddPost: React.FC = () => {
         if ([LoadingStatus.Error, LoadingStatus.NotLoaded].includes(loadingStatus)) {
             navigate("/auth/signin");
         }
-
+        
         if (profile) {
-            dispatch(postImagesActions.globalReset());
             dispatch(getProfileGroups(profile.id));
+            dispatch(postImagesActions.globalReset());
         }
     }, [dispatch, profile, loadingStatus, navigate]);
 

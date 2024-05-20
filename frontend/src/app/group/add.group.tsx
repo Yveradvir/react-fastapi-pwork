@@ -32,7 +32,7 @@ const AddGroup: React.FC = () => {
         try {
             const response = await LaunchedAxios.post("/group/new", values);
             if (response.data.ok) {
-                navigate(`/club/${response.data.subdata.result}`);
+                navigate(`/group/${response.data.subdata.result}`);
             }
             setError("");
         } catch (error) {

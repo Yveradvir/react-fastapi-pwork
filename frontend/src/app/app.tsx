@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Provider } from "react-redux";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Layout from "@modules/components/layout";
@@ -10,7 +9,9 @@ import SignUp from "./auth/signup";
 import SignIn from "./auth/signin";
 import AddPost from "./post/add.post";
 import AddGroup from "./group/add.group";
-import { store } from "@modules/reducers";
+import { useAppSelector, useAppDispatch } from "@modules/reducers";
+import cookies from "@modules/utils/cookies";
+import { getProfile } from "@modules/reducers/profile.slice";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 const LazyMyGroups = lazy(() => import("./group/my.group"));
@@ -29,52 +30,56 @@ const LazyElement: React.FC<{ Lazy: React.LazyExoticComponent<React.FC> }> = ({
 );
 
 const App: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const profile = useAppSelector((state) => state.profile);
+
+    if (
+        cookies.get("refresh_csrf") &&
+        !profile.profile
+    )
+        dispatch(getProfile());
+
     return (
-        <Provider store={store}>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<MainP />} index />
-                    <Route path="/auth/signup" element={<SignUp />} />
-                    <Route path="/auth/signin" element={<SignIn />} />
-                    <Route
-                        path="/home"
-                        element={<LazyElement Lazy={LazyHome} />}
-                    />
-                    <Route path="/post/new" element={<AddPost />} />
-                    <Route path="/group/new" element={<AddGroup />} />
-                    <Route
-                        path="/group/my"
-                        element={<LazyElement Lazy={LazyMyGroups} />}
-                    />
-                    <Route
-                        path="/group/"
-                        element={<LazyElement Lazy={LazyAllGroups} />}
-                    />
-                    <Route
-                        path="/group/:group_id"
-                        element={<LazyElement Lazy={LazySingleGroup} />}
-                    />
-                    <Route
-                        path="/group/:group_id/:post_id"
-                        element={<LazyElement Lazy={LazySinglePost} />}
-                    />
-                    <Route
-                        path="*"
-                        element={
-                            <Layout>
-                                <ErrorPage>
-                                    <p className="lead">
-                                        The page you are looking for might have
-                                        been removed, had its name changed, or
-                                        is temporarily unavailable.
-                                    </p>
-                                </ErrorPage>
-                            </Layout>
-                        }
-                    />
-                </Routes>
-            </BrowserRouter>
-        </Provider>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<MainP />} index />
+                <Route path="/auth/signup" element={<SignUp />} />
+                <Route path="/auth/signin" element={<SignIn />} />
+                <Route path="/home" element={<LazyElement Lazy={LazyHome} />} />
+                <Route path="/post/new" element={<AddPost />} />
+                <Route path="/group/new" element={<AddGroup />} />
+                <Route
+                    path="/group/my"
+                    element={<LazyElement Lazy={LazyMyGroups} />}
+                />
+                <Route
+                    path="/group/"
+                    element={<LazyElement Lazy={LazyAllGroups} />}
+                />
+                <Route
+                    path="/group/:group_id"
+                    element={<LazyElement Lazy={LazySingleGroup} />}
+                />
+                <Route
+                    path="/group/:group_id/:post_id"
+                    element={<LazyElement Lazy={LazySinglePost} />}
+                />
+                <Route
+                    path="*"
+                    element={
+                        <Layout>
+                            <ErrorPage>
+                                <p className="lead">
+                                    The page you are looking for might have been
+                                    removed, had its name changed, or is
+                                    temporarily unavailable.
+                                </p>
+                            </ErrorPage>
+                        </Layout>
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
     );
 };
 

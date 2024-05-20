@@ -124,14 +124,40 @@ const SinglePost: React.FC = () => {
                             </AccordionDetails>
                         </Accordion>
                         {post.am_author && (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                style={{ marginTop: "16px" }}
-                                onClick={() => navigate(`/posts/edit/${post.post.id}`)}
-                            >
-                                Edit Post
-                            </Button>
+                            <>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    style={{ marginTop: "16px" }}
+                                    onClick={() => {
+                                        const _ = async () => {
+                                            await LaunchedAxios.delete(
+                                                `/post/single/${post_id}`
+                                            );
+                                            navigate(-1)
+                                        };
+                                        _();            
+                                    }}
+                                >
+                                    Delete post
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="warning"
+                                    style={{ marginTop: "16px" }}
+                                    onClick={() => {
+                                        const _ = async () => {
+                                            await LaunchedAxios.patch(
+                                                `/post/single/${post_id}/toggle`
+                                            );
+                                            navigate(-1)
+                                        };
+                                        _();            
+                                    }}
+                                >
+                                    Switch activity
+                                </Button>
+                            </>
                         )}
                     </>
                 )

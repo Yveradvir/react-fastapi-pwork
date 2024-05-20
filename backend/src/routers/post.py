@@ -44,6 +44,60 @@ async def get_post(
             status.HTTP_404_NOT_FOUND,
             detail="Post is not found"
         )
+    
+@subrouter.delete("/{post_id}", status_code=status.HTTP_200_OK)
+async def delete_post(
+    request: Request,
+    post_id: str = Path(..., title="Post ID"),
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    
+    result = await session.execute(
+        select(PostTable)
+        .options(selectinload(PostTable.post_props), selectinload(PostTable.post_images))
+        .filter(PostTable.id == post_id)
+    )
+    post = result.scalars().first()
+
+    if post:
+        if str(post.author_id) == access["payload"]["id"]:
+            for item in [post.post_props, post.post_images, post]:
+                await session.delete(item)
+            await session.commit()
+            
+            return JSONResponse(Subdated(subdata={}).model_dump(), status_code=status.HTTP_200_OK)
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the author of the post")
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
+@subrouter.patch("/{post_id}/toggle", status_code=status.HTTP_200_OK)
+async def toggle_active_post(
+    request: Request,
+    post_id: str = Path(..., title="Post ID"),
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    post = await get_scalar_by_uuid(post_id, session, PostTable)
+
+    if post:
+        if str(post.author_id) == access["payload"]["id"]:
+            post.active = not post.active
+            await session.commit()
+
+            return JSONResponse(
+                Subdated(
+                    subdata={
+                        "current": post.active
+                    }
+                ).model_dump(), status.HTTP_200_OK
+            )
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the author of the post")
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    
 
 router.include_router(subrouter)
 @router.post("/new", status_code=status.HTTP_201_CREATED)
