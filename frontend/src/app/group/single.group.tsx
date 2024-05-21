@@ -28,7 +28,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { IoCloseCircleOutline, IoLogoDiscord } from "react-icons/io5";
-import LeaveJoinButton from "./leave-join";
+import LeaveJoinButton from "./components/leave-join";
+import DeleteBtn from "@modules/components/deleteBtn";
 
 interface Relation {
     totalCount: number;
@@ -130,6 +131,11 @@ const SingleGroup: React.FC = () => {
                                     <Typography variant="body1">
                                         {group.group.content}
                                     </Typography>
+                                    {group.relation.membership?.access === 2 && (<DeleteBtn 
+                                        label="Delete a group"
+                                        url={`/group/single/${group.group.id}`}
+                                        callback={() => {navigate(-1)}}
+                                    />)}
                                 </div>
                             )}
                         </Grid>

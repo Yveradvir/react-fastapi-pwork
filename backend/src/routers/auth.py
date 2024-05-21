@@ -1,9 +1,10 @@
 from api_loader import *
+from src.db.utils import get_scalar_by_uuid
 from src.models.base_models import Subdated
 from base_loader import *
 
 from src.db.auth import UserTable, ProfileImageTable
-from src.models.auth import AuthResponse, SignInRequest, SignUpRequest, BaseAdditionalsModel
+from src.models.auth import AuthResponse, PasswordsRequest, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
 
@@ -127,3 +128,18 @@ async def refresh(
     jwtsecure.set_access_cookie(response, new)
 
     return response
+
+@router.post("/passwords", status_code=status.HTTP_200_OK)
+async def passwords(
+    request: Request, body: PasswordsRequest,
+    session: AsyncSession = Depends(db.get_session)
+):
+    access = jwtsecure.access_required(request)
+    user = await get_scalar_by_uuid(access["payload"]["id"], session)
+
+    return JSONResponse(
+        Subdated(
+            ok=password.verify(body.password, user.password), 
+            subdata={}
+        ).model_dump()
+    )

@@ -14,6 +14,9 @@ class SignInRequest(BaseRequestModel):
     username: str
     password: str
 
+class PasswordsRequest(BaseRequestModel):
+    password: str
+
 class AuthResponse(BaseResponseModel):
     class Subdata(BaseModel):
         uuid: str

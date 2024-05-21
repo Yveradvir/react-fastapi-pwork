@@ -1,5 +1,5 @@
 from fastapi import Path, Query
-from sqlalchemy import Select, func
+from sqlalchemy import Select, func, delete
 
 from api_loader import *
 from base_loader import *
@@ -135,7 +135,13 @@ async def delete_group(
 
     if group:
         if membership.access == 2:
-            await session.delete()
+            await session.execute(
+                delete(GroupUserMemberships).where(
+                    GroupUserMemberships.group_id == group.id
+                )
+            )
+            await session.delete(group)
+            await session.commit()
 
             return JSONResponse(
                 Subdated(subdata={}).model_dump()

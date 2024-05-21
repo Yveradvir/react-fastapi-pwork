@@ -19,6 +19,7 @@ import { PostImages, PostProps } from "@modules/validations/post.vd";
 import { InitialMixin, RejectedError } from "@modules/reducers/main";
 import { LaunchedAxios } from "@modules/api/api";
 import { YvesFile } from "@modules/utils/const";
+import DeleteBtn from "@modules/components/deleteBtn";
 
 interface IPostProps extends PostProps, InitialMixin { id: string }
 interface IPostImages extends PostImages, InitialMixin { id: string }
@@ -124,23 +125,12 @@ const SinglePost: React.FC = () => {
                             </AccordionDetails>
                         </Accordion>
                         {post.am_author && (
-                            <>
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    style={{ marginTop: "16px" }}
-                                    onClick={() => {
-                                        const _ = async () => {
-                                            await LaunchedAxios.delete(
-                                                `/post/single/${post_id}`
-                                            );
-                                            navigate(-1)
-                                        };
-                                        _();            
-                                    }}
-                                >
-                                    Delete post
-                                </Button>
+                            <>  
+                                <DeleteBtn
+                                    label="Delete post"
+                                    url={`/post/single/${post_id}`}
+                                    callback={() => {navigate(-1)}}
+                                />
                                 <Button
                                     variant="contained"
                                     color="warning"
