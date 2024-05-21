@@ -1,10 +1,12 @@
-from uuid import UUID
 from fastapi import Path
-from httpx import options
+
+from sqlalchemy import delete
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import IntegrityError
 
 from api_loader import *
-from src.db.post import GroupTable, GroupUserMemberships
+from src.models.auth import PasswordsRequest
+from src.db.post import GroupTable, GroupUserMemberships, PostImagesTable, PostPropsTable, PostTable
 from base_loader import *
 
 from src.db.utils import get_scalar_by_uuid
@@ -66,6 +68,43 @@ async def get_profile_image(
             status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+
+@subrouter.delete("/{user_id}")
+async def delete_account(
+    body: PasswordsRequest,
+    user_id: str = Path(..., title="User ID"),
+    session: AsyncSession = Depends(db.get_session)
+):
+    user = await get_scalar_by_uuid(user_id, session, UserTable)
+
+    if user:
+        if password.verify(body.password, user.password):
+            try:
+                await session.execute(delete(GroupUserMemberships).where(GroupUserMemberships.user_id == user.id))
+                await session.execute(delete(PostPropsTable).where(PostPropsTable.post_id.in_(
+                    select(PostTable.id).where(PostTable.author_id == user.id)
+                )))
+                await session.execute(delete(PostImagesTable).where(PostImagesTable.post_id.in_(
+                    select(PostTable.id).where(PostTable.author_id == user.id)
+                )))
+                await session.execute(delete(PostTable).where(PostTable.author_id == user.id))
+                await session.execute(delete(GroupTable).where(GroupTable.author_id == user.id))
+
+                await session.delete(user)
+                await session.commit()
+
+                response = JSONResponse(Subdated(subdata={}).model_dump())
+                jwtsecure.dismantle(response)
+
+                return response
+            except IntegrityError as e:
+                print(e)
+                await session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete user due to database integrity error.")
+        else:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Passwords must match")
+    else:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
 
 @subrouter.get("/{user_id}/groups", response_model=Subdated, status_code=status.HTTP_200_OK)
 async def get_profile_groups(

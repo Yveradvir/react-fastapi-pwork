@@ -25,7 +25,7 @@ class GroupUserMemberships(InitialMixin, db.base):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
-class PostTable(InitialMixin, Base):
+class PostTable(InitialMixin, db.base):
     __tablename__ = "posts"
 
     group_id = Column(Uuid(as_uuid=True), ForeignKey('groups.id'))
@@ -34,16 +34,16 @@ class PostTable(InitialMixin, Base):
     content = Column(Text, nullable=False)
     active = Column(Boolean, default=True)
 
-    post_props = relationship("PostPropsTable", uselist=False, cascade="all, delete-orphan", backref="posts")
-    post_images = relationship("PostImagesTable", uselist=False, cascade="all, delete-orphan", backref="posts")
+    post_props = relationship("PostPropsTable", uselist=False, cascade="all, delete-orphan", backref="post")
+    post_images = relationship("PostImagesTable", uselist=False, cascade="all, delete-orphan", backref="post")
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
-class PostPropsTable(InitialMixin, Base):
+class PostPropsTable(InitialMixin, db.base):
     __tablename__ = "postprops"
 
-    post_id = Column(Uuid(as_uuid=True), ForeignKey('posts.id'))
+    post_id = Column(Uuid(as_uuid=True), ForeignKey('posts.id', ondelete='CASCADE'))
     rank = Column(String)
     discord_tag = Column(String)
     telegram_tag = Column(String)
@@ -51,21 +51,19 @@ class PostPropsTable(InitialMixin, Base):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
-class PostImagesTable(InitialMixin, Base):
+class PostImagesTable(InitialMixin, db.base):
     __tablename__ = "postimages"
 
-    post_id = Column(Uuid(as_uuid=True), ForeignKey('posts.id'))
+    post_id = Column(Uuid(as_uuid=True), ForeignKey('posts.id', ondelete='CASCADE'))
 
     main = Column(LargeBinary, nullable=True)
     second = Column(LargeBinary, nullable=True)
     third = Column(LargeBinary, nullable=True)
     fourth = Column(LargeBinary, nullable=True)
     fifth = Column(LargeBinary, nullable=True)
- 
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def get_main(self):
-        return b64encode(
-            self.main
-        ).decode() if self.main else None
+        return b64encode(self.main).decode() if self.main else None

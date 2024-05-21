@@ -33,7 +33,7 @@ const DeleteBtn: React.FC<DeleteBtnInterface> = ({ callback, label, url }) => {
             if (pCheck.data.ok) {
                 setError(false);
 
-                await LaunchedAxios.delete(url);
+                await LaunchedAxios.delete(url, {data: {password}});
                 if (callback) callback();
             } else {
                 setError(true);

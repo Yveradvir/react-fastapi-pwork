@@ -15,9 +15,7 @@ const Header: React.FC = () => {
     const navs: NavItem[] = [
         { to: "/home", text: "Home" },
         { to: "/group", text: "Groups" },
-        { to: "/pricing", text: "Pricing" },
-        { to: "/faqs", text: "FAQs" },
-        { to: "/about", text: "About" },
+        { to: "/", text: "Index" },
     ];
 
     return (
@@ -27,7 +25,7 @@ const Header: React.FC = () => {
                     <Grid item xs={8} className="d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center">
                             <Typography variant="h4" component="h1" color="primary">
-                                OcoolO
+                                Findmaty
                             </Typography>
                         </div>
                         <nav>

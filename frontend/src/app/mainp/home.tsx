@@ -6,8 +6,11 @@ import { LoadingStatus } from "@modules/reducers/main";
 import { getProfile } from "@modules/reducers/profile.slice";
 import { useEffect } from "react";
 import { Card, Grid, Typography } from "@mui/material";
+import DeleteBtn from "@modules/components/deleteBtn";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { profile, loadingStatus, error } = useAppSelector((state) => state.profile);
 
@@ -35,6 +38,11 @@ const Home: React.FC = () => {
                                 <Typography variant="h4">
                                     Welcome, {profile.first_name} {profile.last_name}
                                 </Typography>
+                                <DeleteBtn
+                                    label="Delete an account"
+                                    url={`/profile/single/${profile.id}`}
+                                    callback={() => {navigate("/auth/signin")}}
+                                />
                             </Grid>
                         </Grid>
                     </Card>

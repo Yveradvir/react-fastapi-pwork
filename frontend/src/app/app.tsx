@@ -12,6 +12,7 @@ import AddGroup from "./group/add.group";
 import { useAppSelector, useAppDispatch } from "@modules/reducers";
 import cookies from "@modules/utils/cookies";
 import { getProfile } from "@modules/reducers/profile.slice";
+import { LoadingStatus } from "@modules/reducers/main";
 
 const LazyHome = lazy(() => import("./mainp/home"));
 const LazyMyGroups = lazy(() => import("./group/my.group"));
@@ -35,7 +36,8 @@ const App: React.FC = () => {
 
     if (
         cookies.get("refresh_csrf") &&
-        !profile.profile
+        !profile.profile &&
+        [LoadingStatus.Error, LoadingStatus.NotLoaded].includes(profile.loadingStatus)
     )
         dispatch(getProfile());
 

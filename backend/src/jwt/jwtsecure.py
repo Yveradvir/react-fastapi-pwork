@@ -296,3 +296,10 @@ class JwtSecure:
         
     def access_required(self, request: Request) -> Dict: return self.jwt_required(request, "access")
     def refresh_required(self, request: Request) -> Dict: return self.jwt_required(request, "refresh")
+
+    def dismantle(self, response: Response) -> None:
+        response.delete_cookie(self.config.access_cookie_name)
+        response.delete_cookie(self.config.access_csrf_cookie_name)
+
+        response.delete_cookie(self.config.refresh_cookie_name)
+        response.delete_cookie(self.config.refresh_csrf_cookie_name)
