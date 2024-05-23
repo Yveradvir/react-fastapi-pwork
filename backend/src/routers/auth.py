@@ -7,6 +7,7 @@ from src.db.auth import UserTable, ProfileImageTable
 from src.models.auth import AuthResponse, PasswordsRequest, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
+api_key = lambda uid: f"$[{uid}]::{token_urlsafe(16)};{password.encrypt(token_urlsafe(8)+str(uuid4()))}"
 
 @router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def signup(
@@ -35,9 +36,12 @@ async def signup(
             await session.commit()
 
             uid = str(new_user.id)
+            new_user.api_key = api_key(uid)
             
             if body.profile_image:
                 await ProfileImageTable.add_new(b64=body.profile_image, uid=uid)
+
+            await session.commit()
 
             access, access_csrf = jwtsecure.create_access_token(data={"id": uid})
             refresh, refresh_csrf = jwtsecure.create_refresh_token(data={"id": uid})
@@ -82,6 +86,9 @@ async def signin(
         if password.verify(body.password, user.password):
             access, access_csrf = jwtsecure.create_access_token(data={"id": uid})
             refresh, refresh_csrf = jwtsecure.create_refresh_token(data={"id": uid})
+
+            user.api_key = api_key(uid)
+            await session.commit()
 
             response = JSONResponse(
                 AuthResponse(

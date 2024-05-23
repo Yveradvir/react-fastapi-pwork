@@ -15,6 +15,7 @@ export interface ProfileEntity {
     created_at: string
     updated_at: string
     profile_b64?: string;
+    api_key: string;
 }
 
 export interface CurrentProfileState {

@@ -3,7 +3,7 @@ import Danger from "@modules/components/danger";
 import Layout from "@modules/components/layout";
 import SpinnerButton from "@modules/components/submitspinner";
 import { useAppSelector } from "@modules/reducers";
-import { LoadingStatus } from "@modules/reducers/main";
+import { LoadingStatus, ReduxRejfullTools } from "@modules/reducers/main";
 import { GroupSchema, GroupValues } from "@modules/validations/group.vd";
 import { Grid, TextField, Typography } from "@mui/material";
 import {
@@ -36,7 +36,7 @@ const AddGroup: React.FC = () => {
             }
             setError("");
         } catch (error) {
-            setError("Something went wrong . . .");
+            setError((ReduxRejfullTools.standartAxiosReject(error)).detail)
         } finally {
             action.setSubmitting(false);
         }

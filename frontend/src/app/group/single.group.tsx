@@ -105,7 +105,7 @@ const SingleGroup: React.FC = () => {
                 onClose={() => {
                     setJoinError(false);
                 }}
-                message="You cannot be a member more than 10 groups (Including your own)"
+                message="You cannot be a member more than 5 groups (Including your own)"
                 action={action}
             />
             {error ? (

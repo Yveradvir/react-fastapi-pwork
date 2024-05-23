@@ -6,14 +6,12 @@ from src.bot.bot import (
 )
     
 async def main():
-    try:
-        await bot.send_message(_g("bot_admin"), "```Bot is working . . .```")
-            
-        # await dp.bot.set_my_commands(src.bot.handlers.commands)
-        await dp.start_polling(bot)
-    finally:
-        await dp.storage.close()
-        await bot.session.close()
+    # await dp.bot.set_my_commands(src.bot.handlers.commands)
+    await bot.send_message(_g("bot_admin"), "```Bot is working . . .```")
+    await dp.start_polling(bot)
 
-if __name__ == '__main__':
-    asyncio.run(main())
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        print("Bot stopped")

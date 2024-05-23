@@ -58,5 +58,5 @@ async def max_memberships(session: AsyncSession, user_id):
         GroupUserMemberships.user_id == user_id
     )
 
-    if len((await session.execute(q)).scalars().all()) >= 10:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You cannot be a member more than 10 groups (Including your own)")
+    if len((await session.execute(q)).scalars().all()) >= 5:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You cannot be a member more than 5 groups (Including your own)")

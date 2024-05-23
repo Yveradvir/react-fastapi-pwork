@@ -4,14 +4,15 @@ import ProfileImage from "@modules/components/profileimage";
 import { useAppDispatch, useAppSelector } from "@modules/reducers";
 import { LoadingStatus } from "@modules/reducers/main";
 import { getProfile } from "@modules/reducers/profile.slice";
-import { useEffect } from "react";
-import { Card, Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Button, Card, Grid, Paper, Typography } from "@mui/material";
 import DeleteBtn from "@modules/components/deleteBtn";
 import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [showToken, setShowToken] = useState(false);
     const { profile, loadingStatus, error } = useAppSelector((state) => state.profile);
 
     useEffect(() => {
@@ -38,13 +39,28 @@ const Home: React.FC = () => {
                                 <Typography variant="h4">
                                     Welcome, {profile.first_name} {profile.last_name}
                                 </Typography>
-                                <DeleteBtn
-                                    label="Delete an account"
-                                    url={`/profile/single/${profile.id}`}
-                                    callback={() => {navigate("/auth/signin")}}
-                                />
+                                <Grid>
+                                    <DeleteBtn
+                                        label="Delete an account"
+                                        url={`/profile/single/${profile.id}`}
+                                        callback={() => {navigate("/auth/signin")}}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        color="info"
+                                        onClick={() => {setShowToken(!showToken)}}
+                                    >
+                                        {showToken ? "Show" : "Hide"} token
+                                    </Button>
+                                </Grid>
                             </Grid>
                         </Grid>
+                        {showToken && (
+                            <Paper>
+                                <Typography>Your secret token:</Typography>
+                                <Typography>{profile.api_key}</Typography>
+                            </Paper>
+                        )}
                     </Card>
                 )
             )}

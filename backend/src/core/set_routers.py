@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from src.routers import (
     auth, profile, 
-    post, group
+    post, group, tgbot
 )
 
 def set_routers(app: FastAPI):
@@ -16,3 +16,4 @@ def set_routers(app: FastAPI):
     app.include_router(profile.router)
     app.include_router(post.router)
     app.include_router(group.router)
+    app.include_router(tgbot.router)

@@ -27,6 +27,7 @@ async def get_profile(
     if user:
         user = user.to_dict()
         user.pop("password")
+        user["api_key"] = user["api_key"].split(";")[0]
 
         return JSONResponse(
             Subdated(
