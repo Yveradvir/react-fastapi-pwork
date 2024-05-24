@@ -5,3 +5,6 @@ class AuthStates(StatesGroup):
     password = State()
     
     confirmation = State()
+
+class SelectingStates(StatesGroup): selecting = State()
+class ScrollingStates(StatesGroup): scrolling = State()

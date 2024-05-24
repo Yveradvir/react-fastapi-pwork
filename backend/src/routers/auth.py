@@ -7,7 +7,7 @@ from src.db.auth import UserTable, ProfileImageTable
 from src.models.auth import AuthResponse, PasswordsRequest, SignInRequest, SignUpRequest, BaseAdditionalsModel
 
 router = APIRouter(prefix="/auth")
-api_key = lambda uid: f"$[{uid}]::{token_urlsafe(16)};{password.encrypt(token_urlsafe(8)+str(uuid4()))}"
+api_key = lambda uid: f"$[{uid}]::{token_urlsafe(16)};{''.join(password.encrypt(token_urlsafe(8)+str(uuid4())).split('/'))}"
 
 @router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def signup(

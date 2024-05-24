@@ -51,7 +51,11 @@ async def auth_states_password(message: types.Message, state: FSMContext):
                 else:
                     print(response)
                     reason = (await response.json())["detail"] or "Reason is not provided"
-                    await message.answer(f"Failed to authenticate with the provided API key.\nReason: {reason}", reply_markup=markup(["Cancel"]))
+                    if "token." in reason.split():
+                        await message.answer("Please, enter CORRECT api token", reply_markup=markup(["Cancel"]))
+                        await state.set_state(AuthStates.api_key)
+                    else:
+                        await message.answer(f"Failed to authenticate with the provided API key.\nReason: {reason}", reply_markup=markup(["Cancel"]))
                     print(await response.text())
     else:
         await message.answer("Registration is over!")
@@ -63,15 +67,17 @@ async def auth_states_confirmation(message: types.Message, state: FSMContext):
 
     if message.text in default_markup_text:
         if message.text == default_markup_text[0]:
-            await message.answer(f"Good luck, {fsm_data['username']}")
 
             async with ClientSession("http://localhost:4300") as cli:
-                async with cli.get(f"/tg/{fsm_data['api_key']}") as response:
+                async with cli.get(f"/tg/{fsm_data['api_key']}/data") as response:
                     if response.status == 200:
+                        await message.answer(f"Good luck, {fsm_data['username']}\n\nBe extra carefull! Api keys are updating every time you sing in site")
                         data = (await response.json())["subdata"]
-                        print(data)
+                        
+                        await state.clear()
                         await state.set_data(data)
-                        await state.set_state(None)
+                    else:
+                        await message.answer("Excuse us, something wrong... Try again or contradict.", reply_markup=markup())
         else:
             await message.answer("Thank for trying, you are not registered. ")
             await state.clear()
